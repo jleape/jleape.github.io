@@ -4,7 +4,10 @@
 }
 body {
     /* background: #f8c362; */
-    background-image: url('https://www.dailymail.co.uk/news/article-7714047/Ultra-high-resolution-aerial-images-reveal-worlds-astonishing-mega-cities.html#i-8c46bae80b0040f7');
+    background-image: url('images/hex/profile.jpg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
 }
 #hexGrid {
   display: flex;
