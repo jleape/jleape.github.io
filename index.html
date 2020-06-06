@@ -2,6 +2,38 @@
 layout: default
 ---
 
+<link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/hex.css" />
+
+<ul id="hexGrid">
+  <li class="hex">
+    <div class="hexIn" syle={background-color: #262625}>
+      <a class="hexLink" href="#">
+        <img src="{{ site.baseurl }}/images/hex/Olin.png" alt="#" />
+        <h1>Atlas of Prevention</h1>
+        <p>A platform to communicate measures for risk prevention.</p>
+      </a>
+    </div>
+  </li>
+  <li class="hex">
+    <div class="hexIn">
+      <a class="hexLink" href="http://doubleup.city/">
+        <img src="{{ site.baseurl }}/images/hex/DoubleUp.png" alt="" />
+        <h1>DoubleUp</h1>
+        <p>A study of collinear transit routes as artifacts of segregation.</p>
+      </a>
+    </div>
+  </li>
+  <li class="hex">
+    <div class="hexIn">
+      <a class="hexLink" href="HyperionTransit">
+        <img src="{{ site.baseurl }}/images/hex/HyperionTransit.png" alt="" />
+        <h1>HyperionTransit</h1>
+        <p>A tool to visualize demand and congestion in transit systems.</p>
+      </a>
+    </div>
+  </li>
+</ul>
+
 <div class="posts">
   {% for post in site.posts %}
     <article class="post">
