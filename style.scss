@@ -19,7 +19,7 @@ html {
 
 body {
 	background: $white;
-  font: 18px/1.4 $helvetica;
+  font: 18px/1.4 $amiri;
   color: $darkGray;
 }
 
@@ -31,10 +31,8 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: $helveticaNeue;
+  font-family: $ubuntu;
   color: $darkerGray;
-  font-weight: bold;
-
   line-height: 1.7;
   margin: 1em 0 15px;
   padding: 0;
@@ -66,11 +64,13 @@ h4 {
 
 p {
   margin: 15px 0;
+  margin-bottom: 50px;
+  margin-top: 50px;
 }
 
 a {
   color: $black;
-  text-decoration: none;
+  text-decoration: underline;
 	cursor: pointer;
   &:hover, &:active {
     color: $black;
@@ -107,7 +107,11 @@ strong, b {
 }
 
 img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
   max-width: 100%;
+  border-radius: 1rem;
 }
 
 // Fixes images in popup boxes from Google Translate
@@ -194,7 +198,7 @@ img {
   margin: 0;
   color: $darkGray;
   cursor: pointer;
-  font-family: $helveticaNeue;
+  font-family: $ubuntu;
   font-weight: 300;
   font-size: 28px;
   letter-spacing: 1px;
@@ -213,7 +217,7 @@ img {
 nav {
   float: right;
   margin-top: 23px; // @TODO: Vertically middle align
-  font-family: $helveticaNeue;
+  font-family: $ubuntu;
   font-size: 18px;
 
   @include mobile {
@@ -273,9 +277,9 @@ nav {
 
 .wrapper-footer {
   margin-top: 50px;
-  border-top: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
-  background-color: $lightGray;
+  // border-top: 1px solid #ddd;
+  // border-bottom: 1px solid #ddd;
+  background-color: #ffffff;
 }
 
 footer {
