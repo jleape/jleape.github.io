@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Design and Engineering for Education and Development
+title: AguaRapida - Passive Water Supplies for Disaster Response
 ---
 
 ![alt]({{ site.baseurl }}/images/posts/AguaRapida/truck.png)
