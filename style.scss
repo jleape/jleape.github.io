@@ -64,8 +64,8 @@ h4 {
 
 p {
   margin: 15px 0;
-  margin-bottom: 50px;
-  margin-top: 50px;
+  // margin-bottom: 50px;
+  // margin-top: 50px;
 }
 
 a {
@@ -110,6 +110,8 @@ img {
   display: block;
   margin-left: auto;
   margin-right: auto;
+  // margin-top: 50px;
+  margin-bottom: 50px;
   padding: 5px;
   max-width: 100%;
   border-radius: 15px;
