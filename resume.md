@@ -36,8 +36,8 @@ and household surveys in Pachuca, Mexico and Sorocaba, Brazil
 ## Education
 
 ### Massachusetts Institute of Technology
-Cambridge, MA, USA
-August 2017 - May 2020
+Cambridge, MA, USA  
+August 2017 - May 2020  
 - Master of Science in Transportation
 - Master of City Planning
 - Research Assistant under Professor P. Christopher Zegras
