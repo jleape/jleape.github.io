@@ -47,12 +47,12 @@ August 2017 - May 2020
 Ithaca, NY, USA  
 August 2007 - June 2011  
 - B.S. in Civil & Environmental Engineering and City & Regional Planning
-- Engineering G.P.A. 4.0 | Total G.P.A. 3.9 | Magna Cum Laude
+- Engineering G.P.A. 4.0, Total G.P.A. 3.9, Magna Cum Laude
 
 ### International School of Geneva
 Geneva, Switzerland  
 September 2005 - May 2007  
-- International Baccalaureate | 40
+- International Baccalaureate, Final Grade 40
 
 ## Recognition
 
