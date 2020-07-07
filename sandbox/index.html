@@ -1,0 +1,45 @@
+---
+layout: default
+---
+
+<link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/hex.css" />
+
+<ul id="hexGrid">
+  <li class="hex">
+    <div class="hexIn" syle={background-color: #262625}>
+      <a class="hexLink" href="{% post_url 2020-06-23-HyperVent %}">
+        <img src="{{ site.baseurl }}/images/hex/HyperVent.png" alt="#" />
+        <h1>HyperVent</h1>
+        <p>Is your city breathing or hyperventilating?</p>
+      </a>
+    </div>
+  </li>
+  <li class="hex">
+    <div class="hexIn">
+      <a class="hexLink" href="{% post_url 2012-04-11-OHDS %}">
+        <img src="{{ site.baseurl }}/images/hex/OHDS.png" alt="" />
+        <h1>OHDS</h1>
+        <p>Machine readable open hardware design specification.</p>
+      </a>
+    </div>
+  </li>
+</ul>
+
+<div style="text-align:right">
+  <a style="font-size:12px" href="https://github.com/web-tiki/responsive-grid-of-hexagons">hex grid by web-tiki</a>
+</div>
+
+<!-- <div class="posts">
+  {% for post in site.posts %}
+    <article class="post">
+
+      <h1><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></h1>
+
+      <div class="entry">
+        {{ post.excerpt }}
+      </div>
+
+      <a href="{{ site.baseurl }}{{ post.url }}" class="read-more">Read More</a>
+    </article>
+  {% endfor %}
+</div> -->
