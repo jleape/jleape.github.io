@@ -8,16 +8,27 @@ After managing construction in South Africa and advising infrastructure projects
 
 ## Experience
 
+### Independent Consultant
+2019 – Present
+I have been contracted by multi-lateral development banks, startups, foundations and universities for a range of strategic and technical services, including the generation of GTFS transit data and the development of software to interactively visualize mobility data.
+
+### International Transport Forum at the OECD — Policy Analyst and Modeller
+August 2020 - December 2020
+- Co-authored report on decarbonizing transport in Europe
+- Presented findings as panelist in public webinar
+- Led data analysis for freight and inter-city passenger sectors
+- Wrote policy briefs for seven decarbonization strategies
+
 ### Alcaldía Mayor de Bogotá — Mobility Advisor
 Bogotá, Colombia  
 February 2016 - August 2017  
-- Co-led 5-year expansion plan of the TransMilenio BRT system
+- Co-led five-year expansion plan of the TransMilenio BRT system
 - Automated generation of GTFS with 6,000 + lines in Python and PostGIS
 - Developed HyperionTransit, software to calculate and visualize indicators
 of all stations, routes and origin-destination pairs of a transit system
 - Advised estimation of origin-destination matrices from smartcard data
 
-### Steer Davies Gleave — Consultant
+### Steer Group — Consultant
 Boston, USA  
 May 2013 - February 2016  
 - Led preliminary to investment-grade demand forecasting studies for
@@ -38,10 +49,10 @@ and household surveys in Pachuca, Mexico and Sorocaba, Brazil
 ### Massachusetts Institute of Technology
 Cambridge, MA, USA  
 August 2017 - May 2020  
-- Master of Science in Transportation
-- Master of City Planning
+- Master of Science in Transportation and Master of City Planning
 - Research Assistant under Professor P. Christopher Zegras
-- Thesis: Winning the Housing Lottery in Rio de Janeiro: Curse or Cure?
+- Coauthored publication: [Scaling Up Innovative Participatory Design for Public Transportation Planning: Lessons from Experiments in the Global South](https://journals.sagepub.com/doi/abs/10.1177/0361198120940998)
+- Thesis: Winning the Housing Lottery in Rio de Janeiro: Curse or Cure? (Available soon on [dspace.mit.edu](dspace.mit.edu))
 
 ### Cornell University
 Ithaca, NY, USA  
