@@ -7,7 +7,7 @@ permalink: /resume/
 ## Skills 
 General — Policy Analysis, Strategic Planning, Statistics, Management, Writing, Teaching, Public Speaking 
 
-Technical — Machine Learning, Causal Inference, R, Python, SQL, JavaScript, PostGIS, QGIS,ArcGIS 
+Technical — Machine Learning, Causal Inference, R, Python, SQL, JavaScript, PostGIS, QGIS, ArcGIS 
 
 Language — English (Native), Spanish (Fluent), Portuguese (Proficient) 
 
