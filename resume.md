@@ -5,7 +5,11 @@ permalink: /resume/
 ---
 
 ## Skills 
-General — Policy Analysis, Strategic Planning, Statistics, Management, Writing, Teaching, Public Speaking Technical — Machine Learning, Causal Inference, R, Python, SQL, JavaScript, PostGIS, QGIS,ArcGIS Language — English (Native), Spanish (Fluent), Portuguese (Proficient)
+General — Policy Analysis, Strategic Planning, Statistics, Management, Writing, Teaching, Public Speaking 
+
+Technical — Machine Learning, Causal Inference, R, Python, SQL, JavaScript, PostGIS, QGIS,ArcGIS 
+
+Language — English (Native), Spanish (Fluent), Portuguese (Proficient) 
 
 ## Experience
 
@@ -16,12 +20,12 @@ Remote | 2018 - present
 - IADB: built a web app for visualizing crowd-sourced traffic data across 10 cities in Latin America
 - World Bank: generated transit data and led accessibility analysis in Cartagena, Colombia
 
-### ITF/OECD — Policy Analyst and Modeller
+### ITF/OECD — Policy Analyst and Modeler
 Remote | 2020
 - Co-authored report for European Commission on decarbonizing transport
 - Presented findings as panelist in public webinar
 - Led data analysis for freight and inter-city passenger sectors
-- Wrote policy briefs for seven decarbonization strategies
+- Wrote policy briefs for 7 decarbonization strategies
 
 ### Mayor’s Office — Mobility Advisor
 Bogotá, Colombia | 2016 - 2017
@@ -31,7 +35,8 @@ Bogotá, Colombia | 2016 - 2017
 
 ### Steer Group — Consultant
 Boston, USA | 2013 - 2016
-- Led and supported demand forecasting for 5 high-speed rail corridors, 2 ferry systems, 2 toll bridges, and 2 managed lanes across the U.S.
+- Led and supported demand forecasting, discrete choice modeling 
+- 5 high-speed rail corridors, 2 ferry systems, 2 toll bridges, and 2 managed lanes across the U.S.
 - Conducted economic impact analyses and hazard mitigation studies for NYC resilience projects
 
 ### LOGIT Consultoria — Transportation Planner
@@ -50,14 +55,15 @@ Cambridge, MA, USA | 2017 - 2020
 
 ### Cornell University
 Ithaca, NY, USA | 2007 - 2011
-- B.S. in Civil Engineering and City & Regional Planning
-- Engineering G.P.A. 4.0 | Total G.P.A. 3.9 | Magna Cum Laude | 8 Dean’s List Awards
-- Co-founder of Cornell University Sustainable Design
-- Led 105 students and local contractors in the construction of a school in South Africa
+- B.S. in Civil Engineering and City & Regional Planning 
+- Engineering G.P.A. 4.0 | Total G.P.A. 3.9 
+- Magna Cum Laude | 8 Dean’s List Awards 
+- Co-founder of Cornell University Sustainable Design 
+- Led 105 students and local contractors in the construction of a school in South Africa 
 
 ### International School of Geneva
 Geneva, Switzerland | 2005 - 2007 
-- International Baccalaureate, Final Grade 40 
+- International Baccalaureate, Final Grade 40 / 42 
 - Extracurriculars: jazz piano, percussion, rugby, Student League of Nations 
 
 ## Recognition
@@ -66,7 +72,7 @@ Geneva, Switzerland | 2005 - 2007
 - Engineering News Record Best Project for Schoolhouse South Africa — 2013
 - Architizer A+ Popular Choice Award for Schoolhouse South Africa — 2013
 - Oikos Student Leadership Award for Schoolhouse South Africa — 2011
-- Honorable Mention, Gertrude Spencer Portfolio Award in Writing — 2008
 - 2 Bartels Award Grants for Research in Mexico City and Schoolhouse South Africa — 2010, 2011
+- Honorable Mention, Gertrude Spencer Portfolio Award in Writing — 2008
 - 8 Dean’s List Awards 2007 - 2011
 - College of Engineering Global Fellow — 2011
