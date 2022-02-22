@@ -56,8 +56,8 @@ Cambridge, MA, USA | 2017 - 2020
 ### Cornell University
 Ithaca, NY, USA | 2007 - 2011
 - B.S. in Civil Engineering and City & Regional Planning 
-- Engineering G.P.A. 4.0 | Total G.P.A. 3.9 
-- Magna Cum Laude | 8 Dean’s List Awards 
+- Engineering G.P.A. 4.0, Total G.P.A. 3.9 
+- Magna Cum Laude, 8 Dean’s List Awards 
 - Co-founder of Cornell University Sustainable Design 
 - Led 105 students and local contractors in the construction of a school in South Africa 
 
