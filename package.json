@@ -17,7 +17,12 @@
     "extract:rally": "python3 private/_src/apps/rally/scripts/extract.py /Users/jleape/workspace/claude_apps/rally/prototype/rally.html private/_src/apps/rally && python3 private/_src/apps/gambiarra/scripts/fix-mojibake.py private/_src/apps/rally/src/App.jsx",
     "build:rally": "npm run build --prefix private/_src/apps/rally",
     "encrypt:rally": "staticrypt private/_src/apps/rally/dist/index.html -p \"$STATICRYPT_PW_RALLY\" --short --remember 30 -d apps/rally --template-title Stealth --template-instructions \"Enter password to continue.\" --template-button Unlock",
-    "publish:rally": "npm run install:rally && npm run extract:rally && npm run build:rally && npm run encrypt:rally"
+    "publish:rally": "npm run install:rally && npm run extract:rally && npm run build:rally && npm run encrypt:rally",
+    "install:dsm": "npm install --prefix private/_src/apps/dsm",
+    "fix:dsm": "python3 private/_src/apps/gambiarra/scripts/fix-mojibake.py private/_src/apps/dsm/src/App.jsx",
+    "build:dsm": "npm run build --prefix private/_src/apps/dsm",
+    "encrypt:dsm": "staticrypt private/_src/apps/dsm/dist/index.html -p \"$STATICRYPT_PW_DSM\" --short --remember 30 -d apps/dsm --template-title Stealth --template-instructions \"Enter password to continue.\" --template-button Unlock",
+    "publish:dsm": "npm run install:dsm && npm run build:dsm && npm run encrypt:dsm"
   },
   "devDependencies": {
     "staticrypt": "^3.5.0"

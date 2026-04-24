@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+  <rect width="100" height="100" fill="#262625"/>
+  <g transform="translate(50 40)">
+    <!-- 4x4 matrix cells with a visible cluster structure -->
+    <g stroke="#3a4a60" stroke-width="0.4" fill="none">
+      <rect x="-20" y="-20" width="40" height="40" rx="1"/>
+      <line x1="-10" y1="-20" x2="-10" y2="20"/>
+      <line x1="0"   y1="-20" x2="0"   y2="20"/>
+      <line x1="10"  y1="-20" x2="10"  y2="20"/>
+      <line x1="-20" y1="-10" x2="20" y2="-10"/>
+      <line x1="-20" y1="0"   x2="20" y2="0"/>
+      <line x1="-20" y1="10"  x2="20" y2="10"/>
+    </g>
+    <!-- Diagonal cells (self) -->
+    <rect x="-19" y="-19" width="8" height="8" fill="#38bdf8" opacity="0.25"/>
+    <rect x="-9"  y="-9"  width="8" height="8" fill="#38bdf8" opacity="0.25"/>
+    <rect x="1"   y="1"   width="8" height="8" fill="#a78bfa" opacity="0.3"/>
+    <rect x="11"  y="11"  width="8" height="8" fill="#a78bfa" opacity="0.3"/>
+    <!-- Off-diagonal interactions (within clusters) -->
+    <rect x="-9"  y="-19" width="8" height="8" fill="#38bdf8" opacity="0.5"/>
+    <rect x="-19" y="-9"  width="8" height="8" fill="#38bdf8" opacity="0.5"/>
+    <rect x="11"  y="1"   width="8" height="8" fill="#a78bfa" opacity="0.6"/>
+    <!-- Off-diagonal coupling (cross-cluster lock-in) -->
+    <rect x="1"   y="-19" width="8" height="8" fill="#f87171" opacity="0.45"/>
+    <!-- Cluster outlines -->
+    <rect x="-20" y="-20" width="20" height="20" fill="none" stroke="#38bdf8" stroke-width="1"/>
+    <rect x="0"   y="0"   width="20" height="20" fill="none" stroke="#a78bfa" stroke-width="1"/>
+  </g>
+  <text x="50" y="78" font-family="'DM Mono', 'IBM Plex Mono', monospace" font-size="18" font-weight="500" fill="#38bdf8" text-anchor="middle" letter-spacing="2.5">DSM</text>
+</svg>

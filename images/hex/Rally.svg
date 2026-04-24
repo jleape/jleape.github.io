@@ -1,17 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
   <rect width="100" height="100" fill="#262625"/>
-  <!-- megaphone -->
   <g transform="translate(50 38) rotate(-18)">
     <path d="M -20 -8 L 10 -14 L 16 -14 A 4 4 0 0 1 16 14 L 10 14 L -20 8 Z" fill="#6C63FF"/>
     <rect x="-26" y="-8" width="6" height="16" fill="#6C63FF"/>
     <path d="M 10 -14 L 10 14" stroke="#5A52D5" stroke-width="1.2" fill="none"/>
     <circle cx="14" cy="0" r="2" fill="#FFFFFF" opacity="0.7"/>
   </g>
-  <!-- sound waves -->
   <g stroke="#FF6584" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.9">
     <path d="M 78 28 Q 84 38 78 48"/>
     <path d="M 84 22 Q 92 38 84 54"/>
   </g>
-  <text x="50" y="70" font-family="-apple-system, 'Inter', system-ui, sans-serif" font-size="19" font-weight="800" fill="#FFFFFF" text-anchor="middle" letter-spacing="-0.5">Rally</text>
-  <text x="50" y="85" font-family="-apple-system, 'Inter', system-ui, sans-serif" font-size="4.4" font-weight="600" fill="#6C63FF" text-anchor="middle" letter-spacing="1.8">FANS BRING THE TOUR</text>
+  <text x="50" y="76" font-family="-apple-system, 'Inter', system-ui, sans-serif" font-size="21" font-weight="800" fill="#FFFFFF" text-anchor="middle" letter-spacing="-0.5">Rally</text>
 </svg>
