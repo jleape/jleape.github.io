@@ -7,4 +7,6 @@ _site
 Gemfile
 Gemfile.lock
 node_modules
-package.json
+.env
+private/_src/**/dist/
+private/_src/**/node_modules/

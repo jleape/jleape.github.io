@@ -1,0 +1,15 @@
+{
+  "name": "jleape-github-io-private",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Build + encrypt scripts for the stealth apps served from this site.",
+  "scripts": {
+    "install:gambiarra": "npm install --prefix private/_src/apps/gambiarra",
+    "build:gambiarra": "npm run build --prefix private/_src/apps/gambiarra",
+    "encrypt:gambiarra": "staticrypt private/_src/apps/gambiarra/dist/index.html -p \"$STATICRYPT_PW\" --short --remember 30 -d apps/gambiarra --template-title Stealth --template-instructions \"Enter password to continue.\" --template-button Unlock",
+    "publish:gambiarra": "npm run install:gambiarra && npm run build:gambiarra && npm run encrypt:gambiarra"
+  },
+  "devDependencies": {
+    "staticrypt": "^3.5.0"
+  }
+}
