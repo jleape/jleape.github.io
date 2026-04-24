@@ -22,7 +22,10 @@
     "fix:dsm": "python3 private/_src/apps/gambiarra/scripts/fix-mojibake.py private/_src/apps/dsm/src/App.jsx",
     "build:dsm": "npm run build --prefix private/_src/apps/dsm",
     "encrypt:dsm": "staticrypt private/_src/apps/dsm/dist/index.html -p \"$STATICRYPT_PW_DSM\" --short --remember 30 -d apps/dsm --template-title Stealth --template-instructions \"Enter password to continue.\" --template-button Unlock",
-    "publish:dsm": "npm run install:dsm && npm run build:dsm && npm run encrypt:dsm"
+    "publish:dsm": "npm run install:dsm && npm run build:dsm && npm run encrypt:dsm",
+    "build:supply": "mkdir -p private/_src/apps/supply/dist && cp /Users/jleape/workspace/claude_apps/supply/supply.html private/_src/apps/supply/dist/index.html",
+    "encrypt:supply": "staticrypt private/_src/apps/supply/dist/index.html -p \"$STATICRYPT_PW_SUPPLY\" --short --remember 30 -d apps/supply --template-title Stealth --template-instructions \"Enter password to continue.\" --template-button Unlock",
+    "publish:supply": "npm run build:supply && npm run encrypt:supply"
   },
   "devDependencies": {
     "staticrypt": "^3.5.0"
