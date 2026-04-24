@@ -1,0 +1,13 @@
+html, body { margin: 0; padding: 0; background: #FAF7F2; font-family: 'IBM Plex Sans', system-ui, sans-serif; }
+  *, *::before, *::after { box-sizing: border-box; }
+  .back-to-site {
+    position: fixed; bottom: 14px; left: 16px; z-index: 9999;
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #7A6D5F; text-decoration: none;
+    padding: 8px 12px; background: rgba(255,255,255,0.92);
+    border: 1px solid #E8DFD1; border-radius: 2px;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 2px 12px rgba(26, 20, 16, 0.06);
+  }
+  .back-to-site:hover { color: #1A1410; }
