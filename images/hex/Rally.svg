@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+  <rect width="100" height="100" fill="#6C63FF"/>
+  <g fill="#FF6584" opacity="0.9">
+    <circle cx="22" cy="78" r="2.2"/>
+    <circle cx="30" cy="74" r="2.2"/>
+    <circle cx="38" cy="72" r="2.2"/>
+    <circle cx="46" cy="70" r="2.2"/>
+    <circle cx="54" cy="70" r="2.2"/>
+    <circle cx="62" cy="72" r="2.2"/>
+    <circle cx="70" cy="74" r="2.2"/>
+    <circle cx="78" cy="78" r="2.2"/>
+    <circle cx="26" cy="84" r="2.2"/>
+    <circle cx="34" cy="82" r="2.2"/>
+    <circle cx="42" cy="80" r="2.2"/>
+    <circle cx="50" cy="80" r="2.2"/>
+    <circle cx="58" cy="80" r="2.2"/>
+    <circle cx="66" cy="82" r="2.2"/>
+    <circle cx="74" cy="84" r="2.2"/>
+  </g>
+  <g fill="#FFFFFF" opacity="0.35">
+    <circle cx="50" cy="34" r="9"/>
+  </g>
+  <g stroke="#FFFFFF" stroke-width="1.2" fill="none" opacity="0.6" stroke-linecap="round">
+    <path d="M50 43 L40 60 M50 43 L60 60 M50 25 L50 10"/>
+  </g>
+  <text x="50" y="56" font-family="-apple-system, 'Inter', system-ui, sans-serif" font-size="17" font-weight="800" fill="#FFFFFF" text-anchor="middle" letter-spacing="-0.5">Rally</text>
+  <text x="50" y="95" font-family="-apple-system, 'Inter', system-ui, sans-serif" font-size="4.2" font-weight="600" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.8" opacity="0.75">FANS BRING THE TOUR</text>
+</svg>

@@ -12,7 +12,12 @@
     "extract:aji": "python3 private/_src/apps/aji/scripts/extract.py /tmp/aji-claude-design/aji-website/project/index.html private/_src/apps/aji && python3 private/_src/apps/aji-marketplace/scripts/extract.py /tmp/aji-claude-design/aji-website/project/marketplace.html /tmp/aji-claude-design/aji-website/project/marketplace-app.jsx private/_src/apps/aji-marketplace",
     "build:aji": "npm run build --prefix private/_src/apps/aji && npm run build --prefix private/_src/apps/aji-marketplace",
     "encrypt:aji": "staticrypt private/_src/apps/aji/dist/index.html -p \"$STATICRYPT_PW_AJI\" --short --remember 30 -d apps/aji --template-title Stealth --template-instructions \"Enter password to continue.\" --template-button Unlock && cp private/_src/apps/aji-marketplace/dist/index.html private/_src/apps/aji-marketplace/dist/marketplace.html && staticrypt private/_src/apps/aji-marketplace/dist/marketplace.html -p \"$STATICRYPT_PW_AJI\" --short --remember 30 -d apps/aji --template-title Stealth --template-instructions \"Enter password to continue.\" --template-button Unlock",
-    "publish:aji": "npm run install:aji && npm run build:aji && npm run encrypt:aji"
+    "publish:aji": "npm run install:aji && npm run build:aji && npm run encrypt:aji",
+    "install:rally": "npm install --prefix private/_src/apps/rally",
+    "extract:rally": "python3 private/_src/apps/rally/scripts/extract.py /Users/jleape/workspace/claude_apps/rally/prototype/rally.html private/_src/apps/rally && python3 private/_src/apps/gambiarra/scripts/fix-mojibake.py private/_src/apps/rally/src/App.jsx",
+    "build:rally": "npm run build --prefix private/_src/apps/rally",
+    "encrypt:rally": "staticrypt private/_src/apps/rally/dist/index.html -p \"$STATICRYPT_PW_RALLY\" --short --remember 30 -d apps/rally --template-title Stealth --template-instructions \"Enter password to continue.\" --template-button Unlock",
+    "publish:rally": "npm run install:rally && npm run extract:rally && npm run build:rally && npm run encrypt:rally"
   },
   "devDependencies": {
     "staticrypt": "^3.5.0"
