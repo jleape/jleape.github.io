@@ -133,9 +133,13 @@ const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 const uid = (() => { let i = 0; return (p = 'id') => `${p}${++i}`; })();
 
 function generateMockData() {
-  const TALENT_NAMES = ['Luna Rivera','Marcus Chen','Aisha Patel','Diego Morales','Sienna Brooks','Kai Nakamura','Zoe Williams','Priya Sharma','Jasper Thornton','Mia Fontaine','Ethan Kowalski','Elena Volkov'];
-  const FAN_NAMES = ['Alex Morgan','Casey Johnson','Jamie Rivera','Taylor Brooks','Morgan Lee','Riley Smith','Quinn Adams','Avery Taylor','Drew Campbell','Sage Mitchell','Cameron White','Hayden Clark','Dakota Evans','Reese Martin','Finley Garcia','Charlie Anderson','Parker Wilson','Rowan Martinez','Skyler Brown','Jesse Davis'];
-  const VENUE_NAMES = ['The Blue Note','Starlight Theatre','Brick & Mortar','The Velvet Lounge','Underground Club','The Green Room','Moonlight Bar','Liberty Hall','The Jazz Corner','Crystal Ballroom','Warehouse 23','The Hive'];
+  // Larger name pools — combinations give thousands of unique combos.
+  const FIRST = ['Luna','Marcus','Aisha','Diego','Sienna','Kai','Zoe','Liam','Priya','Ethan','Mia','Jordan','Aria','Noah','Chloe','Sam','Elena','Jasper','Fatima','Owen','Layla','Felix','Ruby','Max','Nadia','Tyler','Ava','Isaac','Maya','Caleb','Sophia','Leo','Emma','Dante','Ines','Ryan','Camila','Axel','Zara','Blake','Naomi','Vincent','Stella','Hugo','Iris','Wyatt','Aurora','Remi','Jade','Oscar'];
+  const LAST = ['Rivera','Chen','Patel','Morales','Brooks','Nakamura','Williams','Sharma','Thornton','Fontaine','Kowalski','Volkov','Lopez','Bergstrom','Kim','Okafor','Robinson','Gutierrez','Chang','Sterling','Hussain','Brennan','Sinclair','Torres','Johansson','Reeves','Delgado','Matsuda','Fitzgerald','Moreau','Blackwood','Santos','Lindgren','Ahmed','Harper','Cross','Tran','Monroe','Ferreira','Yang'];
+  const VPREFIX = ['The Blue','Starlight','Brick &','The Velvet','Underground','The Green','Moonlight','Liberty','The Jazz','Crystal','Warehouse','The Hive','Oakwood','Central Park','The Red','Vinyl','The Academy','Sagebrush','Neon','The Patio','The Workshop','Cloud Nine','Harmony','The Forge','Beacon','Electric','The Attic','Copper &','Main Street','The Basement','Pinnacle','Rosewood','The Lantern','Summit','Driftwood','The Parlor','Echo','Wildflower','The Lighthouse','Ironworks','Sapphire','The Nest','Golden Gate','Twilight','The Fox','Saint James','Moss &','Tin Roof','Halftone','Brass'];
+  const VNOUN = ['Note','Theatre','Mortar','Lounge','Auditorium','Club','Arena','Cellar','Ballroom','Room','Hall','Corner','Amphitheatre','Studio','Stage','Door','Records','Saloon','Lights','Pavilion'];
+  const genName  = () => `${pick(FIRST)} ${pick(LAST)}`;
+  const genVName = (i) => `${VPREFIX[i % VPREFIX.length]} ${pick(VNOUN)}`;
 
   const profiles = [];
   const talents = [];
@@ -148,16 +152,18 @@ function generateMockData() {
   const venue_follows = [];
   const venue_offers = [];
   const notifications = [];
+  const tickets = [];
+  const reviews = [];
 
   // Current user (the viewer)
   const me = {
     id: 'me',
-    display_name: 'You (Sample User)',
+    display_name: 'Mochirris',
     city: 'Austin', region: 'TX',
-    is_talent: true, is_venue_owner: true,
+    is_talent: true, is_host: true,
     role: 'fan',
     fan_preferences: ['musician', 'comedian'],
-    social_links: { instagram: '@sampleuser', twitter: '@sampleuser' },
+    social_links: { instagram: '@mochirris', twitter: '@mochirris' },
     avatar_url: null,
   };
   profiles.push(me);
@@ -170,186 +176,324 @@ function generateMockData() {
   const myVenue = { id: uid('v'), owner_id: 'me', name: 'The Austin Sessions', venue_type: 'bar', city: 'Austin', region: 'TX', capacity: 150, sqft: 900, price_per_night: 600, hosted_talent_types: ['musician', 'comedian', 'poet'], verified: true, description: 'Intimate live music venue in downtown Austin.' };
   venues.push(myVenue);
 
-  // Generate talents (each with a profile)
-  TALENT_NAMES.forEach((name, i) => {
+  // 50 talents — round-robin types + cities so every type / city is covered
+  const NUM_TALENTS = 50, NUM_VENUES = 50, NUM_FANS = 100, NUM_TOURS = 30;
+  const allTypes = TALENT_TYPES.map(t => t.value);
+  for (let i = 0; i < NUM_TALENTS; i++) {
     const id = uid('u');
-    const loc = pick(CITIES);
-    const type = pick(TALENT_TYPES).value;
-    profiles.push({ id, display_name: name, city: loc.name, region: loc.region, is_talent: true, is_venue_owner: false, role: 'talent', fan_preferences: [], social_links: { instagram: '@' + name.toLowerCase().replace(/\s/g, '') }, avatar_url: null });
-    talents.push({ id: uid('t'), owner_id: id, talent_type: type, categories: [pick(['rock','jazz','indie','pop','electronic','standup','improv'])], image_url: null });
-  });
+    const name = genName();
+    const loc = CITIES[i % CITIES.length];
+    const type = allTypes[i % allTypes.length];
+    profiles.push({ id, display_name: name, city: loc.name, region: loc.region, is_talent: true, is_host: false, role: 'talent', fan_preferences: [], social_links: { instagram: '@' + name.toLowerCase().replace(/\s/g, '') }, avatar_url: null });
+    talents.push({ id: uid('t'), owner_id: id, talent_type: type, categories: [pick(['rock','jazz','indie','pop','electronic','standup','improv','folk','classical','EDM','hip-hop'])], image_url: null });
+  }
 
-  // Generate venues
-  VENUE_NAMES.forEach((name, i) => {
+  // 50 venues — distribute across cities so every city has at least one
+  for (let i = 0; i < NUM_VENUES; i++) {
     const id = uid('u');
-    const loc = pick(CITIES);
-    profiles.push({ id, display_name: name + ' Management', city: loc.name, region: loc.region, is_talent: false, is_venue_owner: true, role: 'venue', fan_preferences: [], social_links: {}, avatar_url: null });
+    const name = genVName(i);
+    const loc = CITIES[i % CITIES.length];
+    profiles.push({ id, display_name: name + ' Management', city: loc.name, region: loc.region, is_talent: false, is_host: true, role: 'host', fan_preferences: [], social_links: {}, avatar_url: null });
     venues.push({
       id: uid('v'), owner_id: id, name, venue_type: pick(VENUE_TYPES).value,
       city: loc.name, region: loc.region,
-      capacity: pick([50, 100, 200, 300, 500, 1000]),
+      capacity: pick([50, 100, 200, 300, 500, 1000, 2000]),
       sqft: randInt(500, 5000),
-      price_per_night: pick([300, 500, 750, 1000, 2000]),
-      hosted_talent_types: pickN(TALENT_TYPES.map(t => t.value), randInt(2, 5)),
+      price_per_night: pick([300, 500, 750, 1000, 2000, 3000]),
+      hosted_talent_types: pickN(allTypes, randInt(2, 5)),
       verified: Math.random() > 0.5,
-      description: `A ${name} in ${loc.name}.`
+      description: `A ${pick([50,100,200,300,500])}-person room in ${loc.name}.`,
     });
-  });
+  }
 
-  // Generate fans
-  FAN_NAMES.forEach((name, i) => {
+  // 100 fans
+  for (let i = 0; i < NUM_FANS; i++) {
     const id = uid('u');
-    const loc = pick(CITIES);
-    profiles.push({ id, display_name: name, city: loc.name, region: loc.region, is_talent: false, is_venue_owner: false, role: 'fan', fan_preferences: pickN(TALENT_TYPES.map(t => t.value), randInt(1, 3)), social_links: {}, avatar_url: null });
-  });
+    const loc = CITIES[i % CITIES.length];
+    profiles.push({ id, display_name: genName(), city: loc.name, region: loc.region, is_talent: false, is_host: false, role: 'fan', fan_preferences: pickN(allTypes, randInt(1, 4)), social_links: {}, avatar_url: null });
+  }
 
-  // Generate tours & shows
-  const now = Date.now();
-  talents.forEach((talent, i) => {
-    if (i > 6) return; // only first 7 talents have tours
+  // 30 tours — all dates anchored in 2026, weighted status distribution
+  const SEASONS = [
+    { name: 'Winter', monthMin: 0, monthMax: 2 },
+    { name: 'Spring', monthMin: 2, monthMax: 5 },
+    { name: 'Summer', monthMin: 5, monthMax: 8 },
+    { name: 'Fall',   monthMin: 8, monthMax: 10 },
+  ];
+  const SHOW_STATUS_POOL = [
+    'proposed','proposed','proposed',
+    'gathering','gathering','gathering','gathering',
+    'tentative_venue','tentative_venue',
+    'confirmed','confirmed',
+    'sold_out',
+  ];
+  const date2026 = (m, d) => new Date(2026, m, Math.max(1, Math.min(28, d)));
+
+  for (let i = 0; i < NUM_TOURS; i++) {
+    const talent = talents[i % talents.length];
     const talentOwner = profiles.find(p => p.id === talent.owner_id);
-    const startOffset = randInt(7, 60);
-    const duration = randInt(14, 60);
-    const start = new Date(now + startOffset * 86400000);
-    const end = new Date(start.getTime() + duration * 86400000);
-    const ticketPrice = pick([20, 25, 30, 45, 60]);
-    const tourCities = pickN(CITIES, randInt(3, 6));
+    const season = pick(SEASONS);
+    const ticketPrice = pick([20, 25, 30, 40, 50, 60, 75, 100]);
+    const tourCities = pickN(CITIES, randInt(4, 9));
+    const start = date2026(randInt(season.monthMin, Math.min(season.monthMax, 9)), randInt(1, 25));
+    const duration = tourCities.length * randInt(2, 4);
+    const end = new Date(start);
+    end.setDate(start.getDate() + duration);
+    if (end.getFullYear() > 2026) end.setFullYear(2026, 11, 30);
 
     const tour = {
       id: uid('T'),
       talent_id: talent.id,
-      title: `${talentOwner.display_name} — Summer 2026 Tour`,
-      description: `Join ${talentOwner.display_name} on an unforgettable tour.`,
+      title: `${talentOwner.display_name} — ${season.name} 2026 Tour`,
+      description: `Join ${talentOwner.display_name} on an unforgettable ${season.name.toLowerCase()} tour across ${tourCities.length} cities.`,
       start_date: start.toISOString().split('T')[0],
       end_date: end.toISOString().split('T')[0],
       ticket_price: ticketPrice,
-      rally_discount_pct: 20,
-      vip_perks: 'Meet & greet + signed poster',
+      rally_discount_pct: pick([10, 15, 20, 25]),
+      vip_perks: pick(['Meet & greet + signed poster','Front row + signed poster','Backstage tour + photo op','Private Q&A session','VIP lounge access','Soundcheck experience']),
       venue_types: pickN(VENUE_TYPES.map(v => v.value), 3),
-      min_net_revenue: 500,
+      min_net_revenue: pick([500, 1000, 2000, 3000]),
       status: 'active',
       image_url: null,
     };
     tours.push(tour);
 
     tourCities.forEach((c, idx) => {
-      const date = new Date(start.getTime() + (duration / tourCities.length) * idx * 86400000);
-      const status = pick(['proposed', 'proposed', 'gathering', 'tentative_venue', 'confirmed']);
-      const venue = status === 'confirmed' || status === 'tentative_venue' ? pick(venues.filter(v => v.city === c.name)) ?? null : null;
+      const date = new Date(start.getTime() + (duration / Math.max(1, tourCities.length - 1)) * idx * 86400000);
+      const status = pick(SHOW_STATUS_POOL);
+      const cityVenues = venues.filter(v => v.city === c.name);
+      const needsVenue = status === 'confirmed' || status === 'tentative_venue' || status === 'sold_out';
+      const venue = needsVenue && cityVenues.length ? pick(cityVenues) : null;
+
+      // Rally counts scale with momentum
+      const rally = status === 'sold_out' ? randInt(45, 90)
+        : status === 'confirmed' ? randInt(30, 70)
+        : status === 'tentative_venue' ? randInt(20, 55)
+        : status === 'gathering' ? randInt(8, 40)
+        : randInt(2, 18);
+
+      const showId = uid('S');
       shows.push({
-        id: uid('S'),
+        id: showId,
         tour_id: tour.id,
         talent_id: talent.id,
         show_date: date.toISOString().split('T')[0],
-        start_time: '20:00',
+        start_time: pick(['18:00','19:00','20:00','21:00']),
         city: c.name,
         region: c.region,
         venue_id: venue?.id ?? null,
-        rally_count: randInt(3, 45),
+        rally_count: rally,
         status,
         ticket_price: ticketPrice,
         total_tickets: venue?.capacity ?? 0,
-        tickets_sold: status === 'confirmed' ? randInt(0, 20) : 0,
+        tickets_sold: status === 'sold_out' ? venue?.capacity ?? 200 : status === 'confirmed' ? randInt(10, 40) : 0,
         sequence_order: idx,
       });
-    });
-  });
 
-  // Generate a tour for me (the current user) starting in 2 weeks
-  const myTourStart = new Date(now + 14 * 86400000);
-  const myTourEnd = new Date(now + 60 * 86400000);
+      // If the show has a matched venue, log a venue_offer reflecting it
+      if (venue) {
+        const accepted = status === 'confirmed' || status === 'sold_out';
+        venue_offers.push({
+          id: uid('vo'),
+          venue_id: venue.id,
+          show_id: showId,
+          status: accepted ? 'accepted' : 'pending',
+          is_tentative: !accepted,
+          requested_by_talent: false,
+          proposed_price: pick([500, 750, 1000, 1500, 2000]),
+        });
+      }
+    });
+  }
+
+  // Mochirris's own tour — anchored in 2026, mixed statuses
+  const myTourStart = date2026(5, 4);   // Jun 4
+  const myTourEnd   = date2026(7, 17);  // Aug 17
   const myTour = {
     id: uid('T'),
     talent_id: myTalent.id,
-    title: 'My First Tour — 2026',
-    description: 'Testing the waters with some intimate shows.',
+    title: 'Mochirris — Quiet Hours 2026',
+    description: 'Intimate folk shows across seven cities.',
     start_date: myTourStart.toISOString().split('T')[0],
     end_date: myTourEnd.toISOString().split('T')[0],
-    ticket_price: 25,
+    ticket_price: 28,
     rally_discount_pct: 20,
     vip_perks: 'Hand-written thank you note + early entry',
     venue_types: ['bar', 'theatre'],
-    min_net_revenue: 300,
+    min_net_revenue: 500,
     status: 'active',
     image_url: null,
   };
   tours.push(myTour);
-  ['Austin', 'Nashville', 'New Orleans', 'Dallas'].forEach((cityName, idx) => {
-    const city = CITIES.find(c => c.name === cityName);
-    const date = new Date(myTourStart.getTime() + idx * 14 * 86400000);
+  const myCities = ['Austin','Nashville','New Orleans','Atlanta','Richmond','Philadelphia','Brooklyn'];
+  const myStatuses = ['confirmed','tentative_venue','gathering','gathering','proposed','tentative_venue','confirmed'];
+  myCities.forEach((cityName, idx) => {
+    const city = CITIES.find(c => c.name === cityName) ?? { name: cityName, region: 'NY' };
+    const date = new Date(myTourStart.getTime() + idx * 11 * 86400000);
+    if (date.getFullYear() > 2026) date.setFullYear(2026, 11, 28);
+    const status = myStatuses[idx];
+    const cityVenues = venues.filter(v => v.city === city.name);
+    const v = (status === 'confirmed' || status === 'tentative_venue') && cityVenues.length
+      ? (idx === 0 ? myVenue : pick(cityVenues))
+      : null;
+    const showId = uid('S');
     shows.push({
-      id: uid('S'),
+      id: showId,
       tour_id: myTour.id,
       talent_id: myTalent.id,
       show_date: date.toISOString().split('T')[0],
       start_time: '20:00',
       city: city.name, region: city.region,
-      venue_id: idx === 0 ? myVenue.id : null,
-      rally_count: randInt(5, 25),
-      status: idx === 0 ? 'confirmed' : (idx === 1 ? 'tentative_venue' : 'proposed'),
-      ticket_price: 25,
-      total_tickets: idx === 0 ? myVenue.capacity : 0,
-      tickets_sold: 0,
+      venue_id: v?.id ?? null,
+      rally_count: status === 'confirmed' ? randInt(40, 80) : status === 'tentative_venue' ? randInt(20, 50) : status === 'gathering' ? randInt(10, 35) : randInt(2, 12),
+      status,
+      ticket_price: 28,
+      total_tickets: v?.capacity ?? 0,
+      tickets_sold: status === 'confirmed' ? randInt(0, 20) : 0,
       sequence_order: idx,
     });
-  });
-
-  // Generate commitments (me rallying for shows)
-  shows.slice(0, 5).forEach(s => {
-    if (s.talent_id !== myTalent.id) {
-      commitments.push({ id: uid('c'), fan_id: 'me', show_id: s.id, engagement_type: 'rally', status: 'active' });
-      s.rally_count++;
+    if (v) {
+      const accepted = status === 'confirmed';
+      venue_offers.push({ id: uid('vo'), venue_id: v.id, show_id: showId, status: accepted ? 'accepted' : 'pending', is_tentative: !accepted, requested_by_talent: false, proposed_price: 800 });
     }
   });
 
-  // Random fan rallies
+  // Mochirris rallies for ~6 city-matched shows in other tours
+  const otherShows = shows.filter(s => s.talent_id !== myTalent.id);
+  const myCityShows = otherShows.filter(s => s.city === me.city).slice(0, 3);
+  const otherRallies = pickN(otherShows.filter(s => !myCityShows.includes(s)), 4);
+  [...myCityShows, ...otherRallies].forEach(s => {
+    commitments.push({ id: uid('c'), fan_id: 'me', show_id: s.id, engagement_type: 'rally', status: 'active' });
+    s.rally_count++;
+    // Auto-follow the show too (mirrors app behavior)
+    tour_follows.push({ id: uid('tf'), fan_id: 'me', tour_id: s.tour_id, show_id: s.id });
+  });
+
+  // Mochirris owns a ticket for one confirmed show
+  const ticketableShow = otherShows.find(s => s.status === 'confirmed');
+  if (ticketableShow) {
+    tickets.push({
+      id: uid('tk'),
+      fan_id: 'me',
+      show_id: ticketableShow.id,
+      price_paid: Math.round(ticketableShow.ticket_price * 0.8),
+      discount: Math.round(ticketableShow.ticket_price * 0.2),
+      from_rally: true,
+      is_vip: true,
+      status: 'active',
+      purchased_at: new Date().toISOString(),
+    });
+    // Make sure she's also "ralied + following" the ticketed show
+    if (!commitments.some(c => c.fan_id === 'me' && c.show_id === ticketableShow.id)) {
+      commitments.push({ id: uid('c'), fan_id: 'me', show_id: ticketableShow.id, engagement_type: 'rally', status: 'active' });
+    }
+    if (!tour_follows.some(f => f.fan_id === 'me' && f.show_id === ticketableShow.id)) {
+      tour_follows.push({ id: uid('tf'), fan_id: 'me', tour_id: ticketableShow.tour_id, show_id: ticketableShow.id });
+    }
+  }
+
+  // Random fan rallies — momentum-weighted
   profiles.filter(p => p.role === 'fan').forEach(fan => {
-    pickN(shows, randInt(1, 3)).forEach(s => {
+    pickN(shows, randInt(2, 6)).forEach(s => {
       commitments.push({ id: uid('c'), fan_id: fan.id, show_id: s.id, engagement_type: 'rally', status: 'active' });
     });
   });
 
-  // Me following some talent
-  talents.slice(1, 5).forEach(t => {
-    follows.push({ id: uid('f'), follower_id: 'me', following_id: t.owner_id });
-  });
+  // Mochirris follows ~8 talent
+  pickN(talents.slice(1), 8).forEach(t => follows.push({ id: uid('f'), follower_id: 'me', following_id: t.owner_id }));
 
-  // Fans following me + other talent
+  // Fans follow random talent
   profiles.filter(p => p.role === 'fan').forEach(fan => {
-    pickN(talents, randInt(1, 4)).forEach(t => {
-      follows.push({ id: uid('f'), follower_id: fan.id, following_id: t.owner_id });
-    });
+    pickN(talents, randInt(2, 6)).forEach(t => follows.push({ id: uid('f'), follower_id: fan.id, following_id: t.owner_id }));
   });
 
-  // Me following some venues
-  venues.slice(1, 4).forEach(v => {
-    venue_follows.push({ id: uid('vf'), user_id: 'me', venue_id: v.id });
-  });
+  // Mochirris venue follows
+  pickN(venues.slice(1), 5).forEach(v => venue_follows.push({ id: uid('vf'), user_id: 'me', venue_id: v.id }));
 
-  // Some venue offers for my tour
-  const myTourShows = shows.filter(s => s.tour_id === myTour.id);
-  venues.filter(v => v.owner_id !== 'me').slice(0, 3).forEach(v => {
-    const show = pick(myTourShows.filter(s => s.status !== 'confirmed'));
-    if (show) {
-      venue_offers.push({
-        id: uid('vo'),
-        venue_id: v.id,
-        show_id: show.id,
-        status: 'pending',
-        is_tentative: false,
-      });
+  // Hosts offering Mochirris's tour stops + a few talent-initiated requests
+  const mochirrisShows = shows.filter(s => s.tour_id === myTour.id);
+  pickN(venues.filter(v => v.owner_id !== 'me'), 3).forEach(v => {
+    const show = pick(mochirrisShows.filter(s => s.status !== 'confirmed'));
+    if (show && !venue_offers.some(o => o.venue_id === v.id && o.show_id === show.id)) {
+      venue_offers.push({ id: uid('vo'), venue_id: v.id, show_id: show.id, status: 'pending', is_tentative: false, requested_by_talent: false, proposed_price: 750 });
+    }
+  });
+  // Talent-initiated requests Mochirris has sent out
+  const gatheringMineShows = mochirrisShows.filter(s => s.status === 'proposed' || s.status === 'gathering');
+  pickN(gatheringMineShows, 2).forEach(show => {
+    const cityV = venues.filter(v => v.city === show.city && v.owner_id !== 'me');
+    if (cityV.length) {
+      venue_offers.push({ id: uid('vo'), venue_id: pick(cityV).id, show_id: show.id, status: 'pending', is_tentative: false, requested_by_talent: true, proposed_price: 600 });
     }
   });
 
-  // Notifications
-  notifications.push(
-    { id: uid('n'), user_id: 'me', type: 'show_confirmed', title: 'Show confirmed!', body: 'Your Austin show is confirmed at The Austin Sessions.', read: false, created_at: new Date(now - 3600000).toISOString() },
-    { id: uid('n'), user_id: 'me', type: 'venue_matched', title: 'Venue interested', body: 'Crystal Ballroom wants to host your Nashville show.', read: false, created_at: new Date(now - 7200000).toISOString() },
-    { id: uid('n'), user_id: 'me', type: 'rally_reminder', title: 'Your rally is gaining momentum!', body: 'Luna Rivera\'s show in Austin has 12 more fans since you rallied.', read: true, created_at: new Date(now - 86400000).toISOString() },
-    { id: uid('n'), user_id: 'me', type: 'tour_launched', title: 'New tour near you', body: 'Marcus Chen just launched a tour including Austin.', read: true, created_at: new Date(now - 172800000).toISOString() },
-  );
+  // Reviews — for confirmed/sold-out/completed shows. Mostly 4-5 stars.
+  const TALENT_R5 = ["Absolutely incredible — blew me away.","Best show I've seen in years.","Unforgettable night.","Phenomenal performance.","Worth every penny.","Such a vibe.","Their best yet.",""];
+  const TALENT_R4 = ["Really great show.","Solid energy.","Had a blast.","Great set list.",""];
+  const VENUE_R5 = ["Amazing space, perfect acoustics.","Intimate, felt close to the act.","Great sound and vibe.","One of my favorite rooms.",""];
+  const VENUE_R4 = ["Solid venue.","Good sightlines.","Nice space.",""];
+  const fanIds = profiles.filter(p => p.role === 'fan').map(p => p.id);
+  const reviewable = shows.filter(s => s.status === 'confirmed' || s.status === 'sold_out');
+  reviewable.forEach(show => {
+    const numRev = randInt(3, 9);
+    pickN(fanIds, numRev).forEach(fanId => {
+      const r = Math.random() < 0.6 ? 5 : Math.random() < 0.85 ? 4 : 3;
+      reviews.push({
+        id: uid('rv'), reviewer_id: fanId, show_id: show.id,
+        target_type: 'talent', target_id: show.talent_id,
+        rating: r, text: pick(r === 5 ? TALENT_R5 : TALENT_R4) || null,
+        created_at: new Date(Date.now() - randInt(1, 30) * 86400000).toISOString(),
+      });
+      if (show.venue_id && Math.random() < 0.55) {
+        const vr = Math.random() < 0.55 ? 5 : 4;
+        reviews.push({
+          id: uid('rv'), reviewer_id: fanId, show_id: show.id,
+          target_type: 'venue', target_id: show.venue_id,
+          rating: vr, text: pick(vr === 5 ? VENUE_R5 : VENUE_R4) || null,
+          created_at: new Date(Date.now() - randInt(1, 30) * 86400000).toISOString(),
+        });
+      }
+    });
+  });
 
-  return { profiles, talents, venues, tours, shows, commitments, follows, tour_follows, venue_follows, venue_offers, notifications };
+  // Notifications — many, varied, contextually tied to real shows / venues
+  const now = Date.now();
+  const myShows = shows.filter(s => s.tour_id === myTour.id);
+  const followedShows = pickN(otherShows, 8);
+  const meNotifs = [
+    { type: 'show_confirmed',  title: 'Austin show confirmed', body: 'Your rally cleared the threshold — doors open at The Austin Sessions.', minus: 1 },
+    { type: 'threshold_met',   title: 'Nashville is rallying', body: 'Your Nashville show just crossed 50% of the threshold.', minus: 4 },
+    { type: 'venue_matched',   title: 'Crystal Ballroom offered dates', body: 'Three date options for your Nashville stop.', minus: 6 },
+    { type: 'rally_reminder',  title: 'Almost there', body: `Your ${pick(['New Orleans','Atlanta','Richmond'])} show is 9 short of clearing the threshold.`, minus: 12 },
+    { type: 'follow_new',      title: '34 new followers this week', body: 'Your last rally is paying off.', minus: 18, read: true },
+    { type: 'review_received', title: 'New 5-star review', body: 'Someone left a 5-star review after your Austin show.', minus: 24 },
+    { type: 'tour_launched',   title: 'New tour near you', body: `${pick(profiles.filter(p => p.role === 'talent')).display_name} just announced a 2026 tour.`, minus: 30 },
+    { type: 'ticket_available',title: 'Tickets on sale', body: 'Tickets for a confirmed show you rallied are now live.', minus: 36 },
+    { type: 'venue_outgrown',  title: 'Venue outgrown', body: 'Your Austin rally outgrew the matched venue — a bigger room is available.', minus: 48 },
+    { type: 'chat_message',    title: 'New message', body: `${pick(FIRST)} sent you a booking inquiry.`, minus: 60 },
+    { type: 'rally_reminder',  title: 'Your rally is gaining momentum', body: 'A show you rallied just gained 14 more fans.', minus: 72, read: true },
+    { type: 'general',         title: 'Tour schedule updated', body: 'Your Brooklyn date moved by one day.', minus: 96, read: true },
+  ];
+  meNotifs.forEach(n => notifications.push({
+    id: uid('n'), user_id: 'me',
+    type: n.type, title: n.title, body: n.body,
+    read: n.read ?? Math.random() > 0.5,
+    created_at: new Date(now - n.minus * 3600000).toISOString(),
+  }));
+
+  // Sprinkle notifications across other fans (so any fan you "switch to" feels alive)
+  pickN(fanIds, 30).forEach(fanId => {
+    pickN(meNotifs, randInt(2, 5)).forEach(n => {
+      notifications.push({
+        id: uid('n'), user_id: fanId,
+        type: n.type, title: n.title, body: n.body,
+        read: Math.random() > 0.5,
+        created_at: new Date(now - randInt(1, 200) * 3600000).toISOString(),
+      });
+    });
+  });
+
+  return { profiles, talents, venues, tours, shows, commitments, follows, tour_follows, venue_follows, venue_offers, notifications, tickets, reviews };
 }
 
 // ============================================================
@@ -360,18 +504,26 @@ const useApp = () => useContext(AppContext);
 
 function AppProvider({ children }) {
   const [data, setData] = useState(() => {
-    const stored = localStorage.getItem('rally_data');
+    const stored = localStorage.getItem('rally_data_v2');
     if (stored) {
       try { return JSON.parse(stored); } catch {}
     }
     return generateMockData();
   });
   const [currentUserId] = useState('me');
-  const [route, setRoute] = useState({ name: 'tabs', params: {} });
+  const [routeStack, setRouteStack] = useState([{ name: 'tabs', params: {} }]);
+  const route = routeStack[routeStack.length - 1];
+  // setRoute pushes onto the stack; goBack pops. Always keeps at least one
+  // entry so the user can never be stranded with no route.
+  const setRoute = (next) => setRouteStack((stack) => {
+    if (next.name === 'tabs') return [{ name: 'tabs', params: {} }];
+    return [...stack, next];
+  });
+  const goBack = () => setRouteStack((stack) => stack.length > 1 ? stack.slice(0, -1) : stack);
   const [activeTab, setActiveTab] = useState('home');
 
   // Save to localStorage on changes
-  useEffect(() => { localStorage.setItem('rally_data', JSON.stringify(data)); }, [data]);
+  useEffect(() => { localStorage.setItem('rally_data_v2', JSON.stringify(data)); }, [data]);
 
   const me = data.profiles.find(p => p.id === currentUserId);
   const myTalents = data.talents.filter(t => t.owner_id === currentUserId);
@@ -397,7 +549,7 @@ function AppProvider({ children }) {
     }
   };
 
-  const enableVenue = () => updateProfile({ is_venue_owner: true, role: 'venue' });
+  const enableHost = () => updateProfile({ is_host: true, role: 'host' });
 
   const togglePreference = (v) => {
     const prefs = me.fan_preferences ?? [];
@@ -405,7 +557,7 @@ function AppProvider({ children }) {
     updateProfile({ fan_preferences: updated });
   };
 
-  // Shows/rallies
+  // Shows/rallies — rallying auto-follows the show as a side effect.
   const toggleRally = (showId) => {
     const existing = data.commitments.find(c => c.fan_id === currentUserId && c.show_id === showId && c.status === 'active');
     if (existing) {
@@ -415,15 +567,49 @@ function AppProvider({ children }) {
         shows: d.shows.map(s => s.id === showId ? { ...s, rally_count: Math.max(0, s.rally_count - 1) } : s),
       }));
     } else {
-      setData(d => ({
-        ...d,
-        commitments: [...d.commitments, { id: uid('c'), fan_id: currentUserId, show_id: showId, engagement_type: 'rally', status: 'active' }],
-        shows: d.shows.map(s => s.id === showId ? { ...s, rally_count: s.rally_count + 1 } : s),
-      }));
+      setData(d => {
+        const show = d.shows.find(s => s.id === showId);
+        const alreadyFollowing = d.tour_follows.some(f => f.fan_id === currentUserId && f.show_id === showId);
+        return {
+          ...d,
+          commitments: [...d.commitments, { id: uid('c'), fan_id: currentUserId, show_id: showId, engagement_type: 'rally', status: 'active' }],
+          shows: d.shows.map(s => s.id === showId ? { ...s, rally_count: s.rally_count + 1 } : s),
+          tour_follows: alreadyFollowing
+            ? d.tour_follows
+            : [...d.tour_follows, { id: uid('tf'), fan_id: currentUserId, tour_id: show?.tour_id ?? null, show_id: showId }],
+        };
+      });
     }
   };
 
   const isRallied = (showId) => data.commitments.some(c => c.fan_id === currentUserId && c.show_id === showId && c.status === 'active');
+
+  // Tickets — purchasing a ticket also auto-follows the show.
+  const hasTicket = (showId) => (data.tickets ?? []).some(t => t.fan_id === currentUserId && t.show_id === showId && t.status === 'active');
+  const buyTicket = (showId) => {
+    if (hasTicket(showId)) return;
+    setData(d => {
+      const show = d.shows.find(s => s.id === showId);
+      const tour = d.tours.find(t => t.id === show?.tour_id);
+      const rallied = d.commitments.some(c => c.fan_id === currentUserId && c.show_id === showId && c.status === 'active');
+      const fullPrice = show?.ticket_price ?? 0;
+      const discountPct = (tour?.rally_discount_pct ?? 0) / 100;
+      const discount = rallied ? Math.round(fullPrice * discountPct) : 0;
+      const pricePaid = fullPrice - discount;
+      const alreadyFollowing = d.tour_follows.some(f => f.fan_id === currentUserId && f.show_id === showId);
+      return {
+        ...d,
+        tickets: [
+          ...(d.tickets ?? []),
+          { id: uid('tk'), fan_id: currentUserId, show_id: showId, price_paid: pricePaid, discount, from_rally: rallied, is_vip: rallied, status: 'active', purchased_at: new Date().toISOString() },
+        ],
+        shows: d.shows.map(s => s.id === showId ? { ...s, tickets_sold: (s.tickets_sold ?? 0) + 1 } : s),
+        tour_follows: alreadyFollowing
+          ? d.tour_follows
+          : [...d.tour_follows, { id: uid('tf'), fan_id: currentUserId, tour_id: show?.tour_id ?? null, show_id: showId }],
+      };
+    });
+  };
 
   // Follows
   const toggleFollow = (profileId) => {
@@ -458,11 +644,19 @@ function AppProvider({ children }) {
   };
   const isFollowingVenue = (venueId) => data.venue_follows.some(v => v.user_id === currentUserId && v.venue_id === venueId);
 
-  // Venue offers
+  // Venue offers — different rows depending on who reached out first.
   const offerVenue = (venueId, showId) => {
     const existing = data.venue_offers.find(o => o.venue_id === venueId && o.show_id === showId);
     if (existing) return;
-    setData(d => ({ ...d, venue_offers: [...d.venue_offers, { id: uid('vo'), venue_id: venueId, show_id: showId, status: 'pending', is_tentative: false }] }));
+    setData(d => ({ ...d, venue_offers: [...d.venue_offers, { id: uid('vo'), venue_id: venueId, show_id: showId, status: 'pending', is_tentative: false, requested_by_talent: false }] }));
+  };
+  const requestVenue = (venueId, showId) => {
+    const existing = data.venue_offers.find(o => o.venue_id === venueId && o.show_id === showId);
+    if (existing) return;
+    setData(d => ({ ...d, venue_offers: [...d.venue_offers, { id: uid('vo'), venue_id: venueId, show_id: showId, status: 'pending', is_tentative: false, requested_by_talent: true }] }));
+  };
+  const cancelVenueOffer = (offerId) => {
+    setData(d => ({ ...d, venue_offers: d.venue_offers.filter(o => o.id !== offerId) }));
   };
   const withdrawOffer = (venueId, showId) => {
     setData(d => ({ ...d, venue_offers: d.venue_offers.filter(o => !(o.venue_id === venueId && o.show_id === showId)) }));
@@ -508,19 +702,20 @@ function AppProvider({ children }) {
   };
 
   const resetData = () => {
-    localStorage.removeItem('rally_data');
+    localStorage.removeItem('rally_data_v2');
     setData(generateMockData());
   };
 
   const value = {
     data, setData, me, myTalents, myVenues, currentUserId,
-    route, setRoute, activeTab, setActiveTab,
-    updateProfile, switchRole, toggleTalent, enableVenue, togglePreference,
+    route, setRoute, goBack, activeTab, setActiveTab,
+    updateProfile, switchRole, toggleTalent, enableHost, togglePreference,
     toggleRally, isRallied,
+    buyTicket, hasTicket,
     toggleFollow, isFollowing,
     toggleShowFollow, isFollowingShow,
     toggleVenueFollow, isFollowingVenue,
-    offerVenue, withdrawOffer, confirmVenueForShow, rejectOffer,
+    offerVenue, requestVenue, cancelVenueOffer, withdrawOffer, confirmVenueForShow, rejectOffer,
     addTour, deleteTour, addVenue, deleteVenue,
     markNotificationRead,
     resetData,
@@ -576,13 +771,13 @@ const distributeDates = (count, startDate, endDate) => {
 };
 
 const STATUS_META = {
-  proposed: { label: 'Proposed', color: '#6B7280', bg: '#6B728020' },
-  gathering: { label: 'Gathering', color: '#F59E0B', bg: '#F59E0B20' },
-  tentative_venue: { label: 'Tentative', color: '#F59E0B', bg: '#F59E0B20' },
-  confirmed: { label: 'Confirmed', color: '#10B981', bg: '#10B98120' },
-  sold_out: { label: 'Sold Out', color: '#6C63FF', bg: '#6C63FF20' },
-  completed: { label: 'Completed', color: '#6B7280', bg: '#6B728020' },
-  cancelled: { label: 'Cancelled', color: '#EF4444', bg: '#EF444420' },
+  proposed:        { label: 'Proposed',  color: '#8A8275', bg: 'transparent' },
+  gathering:       { label: 'Gathering', color: '#FFC857', bg: 'transparent' },
+  tentative_venue: { label: 'Tentative', color: '#FFC857', bg: 'transparent' },
+  confirmed:       { label: 'Confirmed', color: '#B6FF3D', bg: 'transparent' },
+  sold_out:        { label: 'Sold Out',  color: '#FF5B14', bg: 'transparent' },
+  completed:       { label: 'Completed', color: '#8A8275', bg: 'transparent' },
+  cancelled:       { label: 'Cancelled', color: '#FF3D7F', bg: 'transparent' },
 };
 
 // ============================================================
@@ -592,6 +787,39 @@ const Avatar = ({ name, size = 40 }) => (
   <div className="rounded-full flex items-center justify-center font-semibold text-white" style={{ width: size, height: size, background: 'var(--primary)', fontSize: size * 0.4 }}>
     {(name ?? '??').substring(0, 2).toUpperCase()}
   </div>
+);
+
+// Marquee Rally logo — two raised hands (🙌) in hot orange with neon-green
+// motion marks fanning out above. Conveys the "rally" feeling.
+const RallyLogo = ({ size = 40, bare = false }) => (
+  <svg width={size} height={size} viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+    {!bare && <rect width="200" height="200" rx="40" fill="var(--bg)" />}
+    {/* Motion marks (green) */}
+    <g stroke="var(--secondary)" strokeWidth="6" strokeLinecap="round">
+      <line x1="46"  y1="42" x2="34"  y2="20" />
+      <line x1="72"  y1="32" x2="64"  y2="8" />
+      <line x1="100" y1="28" x2="100" y2="4" />
+      <line x1="128" y1="32" x2="136" y2="8" />
+      <line x1="154" y1="42" x2="166" y2="20" />
+    </g>
+    {/* Two hands (orange) */}
+    <g fill="var(--primary)">
+      {/* Left hand */}
+      <rect x="22"  y="78"  width="11" height="50" rx="5" />
+      <rect x="38"  y="68"  width="11" height="60" rx="5" />
+      <rect x="54"  y="60"  width="11" height="68" rx="5" />
+      <rect x="70"  y="68"  width="11" height="60" rx="5" />
+      <rect x="20"  y="120" width="65" height="50" rx="16" />
+      <rect x="78"  y="114" width="14" height="28" rx="6" />
+      {/* Right hand (mirror) */}
+      <rect x="119" y="68"  width="11" height="60" rx="5" />
+      <rect x="135" y="60"  width="11" height="68" rx="5" />
+      <rect x="151" y="68"  width="11" height="60" rx="5" />
+      <rect x="167" y="78"  width="11" height="50" rx="5" />
+      <rect x="115" y="120" width="65" height="50" rx="16" />
+      <rect x="108" y="114" width="14" height="28" rx="6" />
+    </g>
+  </svg>
 );
 
 const Chip = ({ children, selected, onClick, icon, style }) => (
@@ -606,12 +834,68 @@ const Chip = ({ children, selected, onClick, icon, style }) => (
   </button>
 );
 
+// Editorial section header: eyebrow + big display headline. Use `accent`
+// to turn the last word into hot-orange italic (marquee flourish).
+const SectionHeader = ({ eyebrow, title, accent, sub, size = 44 }) => (
+  <div style={{ marginBottom: 12 }}>
+    {eyebrow && <div className="eyebrow" style={{ marginBottom: 6 }}>{eyebrow}</div>}
+    <div className="headline" style={{ fontSize: size }}>
+      {title}{accent && <> <em>{accent}</em></>}
+    </div>
+    {sub && <div style={{ color: 'var(--text2)', fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', marginTop: 8 }}>{sub}</div>}
+  </div>
+);
+
+const Ticker = ({ stops }) => (
+  <div className="ticker">
+    {stops.map((s, i) => (
+      <React.Fragment key={i}>
+        {i > 0 && <span className="dot">·</span>}
+        {s}
+      </React.Fragment>
+    ))}
+  </div>
+);
+
+// Solid filled status pill — see .pill-* CSS classes.
+const STATUS_PILL = {
+  proposed:        'pill-muted',
+  gathering:       'pill-rallying',
+  tentative_venue: 'pill-tentative',
+  confirmed:       'pill-confirmed',
+  sold_out:        'pill-soldout',
+  completed:       'pill-muted',
+  cancelled:       'pill-cancelled',
+};
 const StatusChip = ({ status }) => {
   const meta = STATUS_META[status] ?? STATUS_META.proposed;
+  const cls = STATUS_PILL[status] ?? 'pill-muted';
+  return <span className={`pill ${cls}`}>{meta.label}</span>;
+};
+
+// Marquee signature: the rally bar as a row of theatre bulbs that
+// light up left-to-right. At 100% the bulbs flip to neon confirm green.
+const RallyBulbs = ({ current, threshold = 50, count = 18, showCount = true, size = 10 }) => {
+  const pct = Math.min(1, current / threshold);
+  const lit = Math.round(pct * count);
+  const full = pct >= 1;
   return (
-    <span style={{ padding: '3px 8px', borderRadius: 10, background: meta.bg, color: meta.color, fontSize: 10, fontWeight: 700, textTransform: 'uppercase' }}>
-      {meta.label}
-    </span>
+    <div>
+      {showCount && (
+        <div className="flex items-center justify-between mb-1.5" style={{ fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: 1.2, color: 'var(--text2)' }}>
+          <span>{current} / {threshold} RALLIED</span>
+          <span style={{ color: full ? 'var(--success)' : 'var(--primary)', fontWeight: 700 }}>
+            {full ? '● THRESHOLD MET' : `${Math.round(pct * 100)}%`}
+          </span>
+        </div>
+      )}
+      <div className="bulbs">
+        {Array.from({ length: count }).map((_, i) => (
+          <div key={i} className={`bulb ${i < lit ? 'on' : ''} ${full ? 'full' : ''}`}
+            style={{ width: size, height: size, borderRadius: size/2 }} />
+        ))}
+      </div>
+    </div>
   );
 };
 
@@ -813,80 +1097,87 @@ function HomeScreen() {
   const allRoles = [
     { key: 'fan', label: 'Fan', icon: 'account', enabled: true },
     { key: 'talent', label: 'Talent', icon: 'mic', enabled: me.is_talent },
-    { key: 'venue', label: 'Host', icon: 'domain', enabled: me.is_venue_owner },
+    { key: 'host', label: 'Host', icon: 'domain', enabled: me.is_host },
   ];
 
   const handleRoleSwitch = (role) => {
     if (role === 'talent' && !me.is_talent) { setShowTalentPicker(true); return; }
-    if (role === 'venue' && !me.is_venue_owner) { app.enableVenue(); return; }
+    if (role === 'host' && !me.is_host) { app.enableHost(); return; }
     app.switchRole(role);
   };
 
   return (
     <div className="p-4">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-4">
-        <Avatar name={me.display_name} size={56} />
-        <div className="flex-1">
-          <div className="font-bold text-lg">{me.display_name}</div>
-          <div className="text-sm text-gray-500">{me.city}, {me.region}</div>
+      {/* Masthead */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <RallyLogo size={36} bare />
+          <div className="wordmark">Rally<span>.</span></div>
         </div>
         <button className="btn btn-text" onClick={() => app.setRoute({ name: 'notifications' })}>
           <Icon name="bell" size={18} />
         </button>
       </div>
 
-      {/* Dashboard stats */}
-      <div className="card mb-4">
-        <div className="grid grid-cols-4 gap-2 text-center">
-          <div>
-            <div className="text-xl font-bold">{followers}</div>
-            <div className="text-xs text-gray-500">Followers</div>
-          </div>
-          <div>
-            <div className="text-xl font-bold">{following}</div>
-            <div className="text-xs text-gray-500">Following</div>
-          </div>
-          <div>
-            <div className="text-xl font-bold">{myVenues.length}</div>
-            <div className="text-xs text-gray-500">Venues</div>
-          </div>
-          <div>
-            <div className="text-xl font-bold">{myTours.length}</div>
-            <div className="text-xs text-gray-500">Tours</div>
-          </div>
+      {/* Identity — big poster name */}
+      <div className="mb-5">
+        <div style={{ marginBottom: 12 }}>
+          <Avatar name={me.display_name} size={48} />
         </div>
+        <div style={{
+          fontFamily: 'var(--display)', fontWeight: 900,
+          fontSize: 52, lineHeight: 0.92, letterSpacing: -2.4,
+          color: 'var(--text)',
+        }}>
+          {me.display_name}<span style={{ color: 'var(--primary)' }}>.</span>
+        </div>
+        <div className="eyebrow eyebrow-dim" style={{ marginTop: 8 }}>
+          {me.city}, {me.region} · {me.role === 'fan' ? 'On the floor' : me.role === 'talent' ? 'On the marquee' : 'Holding doors'}
+        </div>
+      </div>
+
+      {/* Role switcher — pill container */}
+      <div style={{ background: 'var(--surface)', borderRadius: 999, padding: 4, display: 'flex', gap: 2, marginBottom: 20, border: '1px solid var(--rule)' }}>
+        {allRoles.map(r => {
+          const active = me.role === r.key;
+          return (
+            <button key={r.key} type="button"
+              onClick={() => handleRoleSwitch(r.key)}
+              style={{
+                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                padding: '10px 0', borderRadius: 999, border: 'none', cursor: 'pointer',
+                background: active ? 'var(--primary)' : 'transparent',
+                color: active ? 'var(--bg)' : r.enabled ? 'var(--text)' : 'var(--text2)',
+                fontFamily: 'var(--sans)', fontSize: 13, fontWeight: 700,
+                boxShadow: active ? '0 6px 16px rgba(255,91,20,0.35)' : 'none',
+                opacity: r.enabled || active ? 1 : 0.6,
+              }}
+            >
+              <Icon name={r.icon} size={16} />
+              {r.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Stats strip */}
+      <div className="grid grid-cols-4 gap-2 mb-5">
+        <div className="stat"><div className="num">{followers}</div><div className="lbl">Followers</div></div>
+        <div className="stat"><div className="num">{following}</div><div className="lbl">Following</div></div>
+        <div className="stat"><div className="num">{myVenues.length}</div><div className="lbl">Venues</div></div>
+        <div className="stat"><div className="num">{myTours.length}</div><div className="lbl">Tours</div></div>
       </div>
 
       {/* Social accounts */}
       <div className="card mb-4">
-        <div className="font-semibold mb-2">Social Accounts</div>
+        <div className="eyebrow" style={{ marginBottom: 8 }}>Social accounts</div>
         {Object.entries(me.social_links ?? {}).length > 0 ? (
           <div className="space-y-1">
             {Object.entries(me.social_links).map(([k, v]) => (
-              <div key={k} className="text-sm"><span className="font-medium capitalize">{k}:</span> <span className="text-gray-600">{v}</span></div>
+              <div key={k} className="text-sm"><span className="font-medium capitalize">{k}:</span> <span style={{ color: 'var(--text2)' }}>{v}</span></div>
             ))}
           </div>
-        ) : <div className="text-sm text-gray-500">No accounts linked</div>}
-      </div>
-
-      {/* Role toggle */}
-      <div className="font-semibold mb-2">Switch Role</div>
-      <div className="flex gap-2 mb-4">
-        {allRoles.map(r => (
-          <button key={r.key} type="button"
-            onClick={() => handleRoleSwitch(r.key)}
-            className="flex-1 flex items-center justify-center gap-1 py-2.5 rounded-3xl font-semibold text-sm"
-            style={{
-              background: me.role === r.key ? 'var(--primary)' : 'var(--bg)',
-              color: me.role === r.key ? 'white' : r.enabled ? 'var(--text2)' : '#D1D5DB',
-              border: `1.5px ${!r.enabled && me.role !== r.key ? 'dashed' : 'solid'} ${me.role === r.key ? 'var(--primary)' : 'var(--border)'}`,
-            }}
-          >
-            <Icon name={r.icon} size={18} />
-            {r.label}
-          </button>
-        ))}
+        ) : <div className="text-sm" style={{ color: 'var(--text2)' }}>No accounts linked</div>}
       </div>
 
       {/* Talent picker modal */}
@@ -936,7 +1227,7 @@ function HomeScreen() {
         </div>
       )}
 
-      {me.role === 'venue' && (
+      {me.role === 'host' && (
         <div className="card">
           <div className="font-semibold mb-1">Talents I Host</div>
           <div className="text-sm text-gray-500 mb-3">Filter shows to talent types your venues support</div>
@@ -971,6 +1262,11 @@ function ExploreScreen() {
 
   const filtered = useMemo(() => {
     let shows = allShows;
+    // City scopes EVERY section below — partial, case-insensitive match.
+    if (city.trim()) {
+      const c = city.trim().toLowerCase();
+      shows = shows.filter(s => (s.city ?? '').toLowerCase().includes(c));
+    }
     if (typeFilter) {
       const talentIds = data.talents.filter(t => t.talent_type === typeFilter).map(t => t.id);
       shows = shows.filter(s => talentIds.includes(s.talent_id));
@@ -982,26 +1278,25 @@ function ExploreScreen() {
         const tour = data.tours.find(t => t.id === s.tour_id);
         const talent = data.talents.find(t => t.id === s.talent_id);
         const talentProfile = data.profiles.find(p => p.id === talent?.owner_id);
-        return s.city.toLowerCase().includes(q) || tour?.title.toLowerCase().includes(q) || talentProfile?.display_name.toLowerCase().includes(q);
+        return (s.city ?? '').toLowerCase().includes(q) || tour?.title.toLowerCase().includes(q) || talentProfile?.display_name.toLowerCase().includes(q);
       });
     }
     return shows;
-  }, [allShows, search, typeFilter, confirmedOnly]);
+  }, [allShows, city, search, typeFilter, confirmedOnly]);
 
   const followedShows = filtered.filter(s => {
     const talent = data.talents.find(t => t.id === s.talent_id);
     return talent && followedTalentProfileIds.includes(talent.owner_id);
   });
 
-  const cityShows = city.trim() ? filtered.filter(s => s.city.toLowerCase() === city.toLowerCase()) : [];
-
   const trendingShows = [...filtered].sort((a, b) => b.rally_count - a.rally_count).slice(0, 10);
 
   return (
     <div className="p-4">
-      <div className="relative mb-2">
-        <Icon name="search" size={18} color="#6B7280" className="absolute left-3 top-1/2 -translate-y-1/2" />
-        <input className="input pl-10" placeholder="Search shows, talent, cities..." value={search} onChange={e => setSearch(e.target.value)} />
+      <SectionHeader eyebrow={`Discover · ${me?.city ?? 'nearby'}`} title="Who's" accent="playing?" size={44} />
+      <div className="relative mb-3">
+        <Icon name="search" size={18} color="var(--text2)" className="absolute left-4 top-1/2 -translate-y-1/2" />
+        <input className="input" style={{ paddingLeft: 40 }} placeholder="Search shows, talent, cities..." value={search} onChange={e => setSearch(e.target.value)} />
       </div>
 
       {/* Filters */}
@@ -1032,15 +1327,9 @@ function ExploreScreen() {
         </Section>
       )}
 
-      {city.trim() && (
-        <Section title={`In ${city}`} count={cityShows.length}>
-          {cityShows.map(s => <ShowCard key={s.id} show={s} />)}
-          {cityShows.length === 0 && <EmptyText>No shows in {city}</EmptyText>}
-        </Section>
-      )}
-
-      <Section title="Trending">
+      <Section title={city.trim() ? `Trending in ${city.trim()}` : 'Trending'} count={trendingShows.length}>
         {trendingShows.map(s => <ShowCard key={s.id} show={s} />)}
+        {trendingShows.length === 0 && <EmptyText>No shows{city.trim() ? ` in ${city.trim()}` : ''}</EmptyText>}
       </Section>
       <div className="h-8" />
     </div>
@@ -1052,46 +1341,65 @@ function UpcomingScreen() {
   const app = useApp();
   const { data, me } = app;
 
-  const rallied = data.commitments.filter(c => c.fan_id === me.id && c.status === 'active');
-  const followed = data.tour_follows.filter(f => f.fan_id === me.id && f.show_id);
+  const myTickets    = (data.tickets ?? []).filter(t => t.fan_id === me.id && t.status === 'active');
+  const rallied      = data.commitments.filter(c => c.fan_id === me.id && c.status === 'active');
+  const followed     = data.tour_follows.filter(f => f.fan_id === me.id && f.show_id);
 
+  // Priority: ticket > rally > follow. A ticketed show eclipses rally/follow rows.
   const events = useMemo(() => {
     const result = [];
+    const claimed = new Set();
+    for (const t of myTickets) {
+      const show = data.shows.find(s => s.id === t.show_id);
+      if (!show) continue;
+      claimed.add(show.id);
+      result.push({ date: show.show_date, show, kind: 'ticketed', color: 'var(--success)', ticket: t });
+    }
     for (const c of rallied) {
+      if (claimed.has(c.show_id)) continue;
       const show = data.shows.find(s => s.id === c.show_id);
-      if (show) result.push({ date: show.show_date, show, kind: 'rallied', color: show.status === 'confirmed' ? 'var(--success)' : 'var(--primary)' });
+      if (!show) continue;
+      claimed.add(show.id);
+      result.push({ date: show.show_date, show, kind: 'rallied', color: show.status === 'confirmed' ? 'var(--success)' : 'var(--primary)' });
     }
     for (const f of followed) {
+      if (claimed.has(f.show_id)) continue;
       const show = data.shows.find(s => s.id === f.show_id);
-      if (show && !result.some(r => r.show.id === show.id)) {
-        result.push({ date: show.show_date, show, kind: 'following', color: show.status === 'confirmed' ? 'var(--success)' : '#5A52D5' });
-      }
+      if (!show) continue;
+      result.push({ date: show.show_date, show, kind: 'following', color: show.status === 'confirmed' ? 'var(--success)' : 'var(--primary-dark)' });
     }
     return result.sort((a, b) => a.date.localeCompare(b.date));
-  }, [rallied, followed, data.shows]);
+  }, [myTickets, rallied, followed, data.shows]);
 
   return (
     <div className="p-4">
+      <SectionHeader eyebrow="Upcoming" title="What you're" accent="waiting for." size={38} />
       <MonthCalendar events={events} />
 
-      <div className="mt-4">
-        <div className="font-semibold mb-2">Your Events ({events.length})</div>
+      <div className="mt-5">
+        <div className="eyebrow" style={{ marginBottom: 10 }}>Your events · {events.length}</div>
         {events.length === 0 ? (
-          <div className="card text-center text-gray-500 py-8">Rally for shows to see them here</div>
+          <div className="card text-center py-8" style={{ color: 'var(--text2)' }}>Rally for shows to see them here</div>
         ) : (
           events.map(e => {
             const tour = data.tours.find(t => t.id === e.show.tour_id);
             const talent = data.talents.find(t => t.id === e.show.talent_id);
             const talentProfile = data.profiles.find(p => p.id === talent?.owner_id);
+            const pillCls = e.kind === 'ticketed' ? 'pill-confirmed'
+              : e.kind === 'rallied' ? 'pill-rallying'
+              : 'pill-muted';
+            const pillLabel = e.kind === 'ticketed'
+              ? (e.ticket?.from_rally ? 'TICKET · VIP' : 'TICKET')
+              : e.kind.toUpperCase();
             return (
               <div key={e.show.id} className="card mb-2" onClick={() => app.setRoute({ name: 'show', params: { id: e.show.id } })} style={{ cursor: 'pointer' }}>
                 <div className="flex items-center justify-between mb-1">
                   <div className="font-semibold">{tour?.title}</div>
-                  <span className="text-xs font-bold capitalize" style={{ color: e.color }}>{e.kind}</span>
+                  <span className={`pill ${pillCls}`}>{pillLabel}</span>
                 </div>
                 <div className="text-sm text-gray-600">{talentProfile?.display_name} · {e.show.city}</div>
                 <div className="text-sm text-gray-500 mt-1">{formatDateFull(e.show.show_date)}</div>
-                <StatusChip status={e.show.status} />
+                <div className="mt-2"><StatusChip status={e.show.status} /></div>
               </div>
             );
           })
@@ -1112,10 +1420,11 @@ function ToursScreen() {
 
   return (
     <div className="p-4 relative h-full">
+      <SectionHeader eyebrow="Your tours" title="On the" accent={`road (${myTours.length}).`} size={38} />
       <div className="pb-20">
         {myTours.length === 0 ? (
           <div className="card text-center py-10">
-            <Icon name="bus" size={40} color="#D1D5DB" className="mx-auto" />
+            <Icon name="bus" size={40} color="var(--text2)" className="mx-auto" />
             <div className="font-semibold mt-2">No tours yet</div>
             <div className="text-sm text-gray-500 mt-1">Create your first tour to let fans rally for you</div>
           </div>
@@ -1204,7 +1513,8 @@ function DashboardScreen() {
 
   return (
     <div className="p-4">
-      <div className="grid grid-cols-5 gap-2 mb-4 text-center">
+      <SectionHeader eyebrow="Dashboard · Talent" title="The room" accent="at a glance." size={36} />
+      <div className="grid grid-cols-5 gap-2 mb-5 text-center">
         <Stat num={myTours.length} label="Tours" />
         <Stat num={myShows.length} label="Shows" />
         <Stat num={totalRallied} label="Rallied" />
@@ -1253,11 +1563,11 @@ function DashboardScreen() {
               const hasShow = myShows.some(s => s.city === fc.city && s.region === fc.region);
               return (
                 <div key={i} className="flex items-center gap-2 py-1.5">
-                  <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div className="h-full" style={{ width: `${(fc.count / max) * 100}%`, background: hasShow ? 'var(--primary)' : 'var(--warning)' }} />
+                  <div style={{ width: 80, height: 6, background: 'var(--border)', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${(fc.count / max) * 100}%`, background: hasShow ? 'var(--primary)' : 'var(--warning)', boxShadow: hasShow ? '0 0 8px rgba(255,91,20,0.5)' : 'none' }} />
                   </div>
                   <div className="flex-1 text-sm">{fc.city}, {fc.region}</div>
-                  <div className="text-xs text-gray-500">{fc.count}</div>
+                  <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--text2)', letterSpacing: 1 }}>{fc.count}</div>
                   {hasShow && <Icon name="checkCircle" size={14} color="var(--success)" />}
                 </div>
               );
@@ -1310,6 +1620,7 @@ function HostExploreScreen() {
 
   return (
     <div className="p-4">
+      <SectionHeader eyebrow="Explore · Shows near you" title="Who needs" accent="a room?" size={38} />
       <div className="mb-3">
         <div className="label">Offering as</div>
         <div className="flex gap-2 overflow-x-auto hide-scrollbar">
@@ -1368,12 +1679,13 @@ function VenuesScreen() {
   const { myVenues } = app;
   return (
     <div className="p-4 relative h-full">
+      <SectionHeader eyebrow="Host · Your rooms" title="Open the" accent={`doors (${myVenues.length}).`} size={36} />
       <div className="pb-20">
         {myVenues.length === 0 ? (
           <div className="card text-center py-10">
-            <Icon name="domain" size={40} color="#D1D5DB" className="mx-auto" />
+            <Icon name="domain" size={40} color="var(--text2)" className="mx-auto" />
             <div className="font-semibold mt-2">No venues yet</div>
-            <div className="text-sm text-gray-500">Add your first venue to start hosting shows</div>
+            <div className="text-sm" style={{ color: 'var(--text2)' }}>Add your first venue to start hosting shows</div>
           </div>
         ) : (
           myVenues.map(v => {
@@ -1424,11 +1736,12 @@ function BookingsScreen() {
 
   return (
     <div className="p-4">
+      <SectionHeader eyebrow={`Incoming · ${events.length}`} title="Tonight's" accent="mail." size={38} />
       <MonthCalendar events={events} />
-      <div className="mt-4">
-        <div className="font-semibold mb-2">Your Bookings ({events.length})</div>
+      <div className="mt-5">
+        <div className="eyebrow" style={{ marginBottom: 10 }}>Your bookings · {events.length}</div>
         {events.length === 0 ? (
-          <div className="card text-center text-gray-500 py-8">Offer to host shows to see bookings here</div>
+          <div className="card text-center py-8" style={{ color: 'var(--text2)' }}>Offer to host shows to see bookings here</div>
         ) : (
           events.map(e => {
             const tour = data.tours.find(t => t.id === e.show.tour_id);
@@ -1436,10 +1749,10 @@ function BookingsScreen() {
             const status = e.offer.status === 'accepted' ? 'Confirmed' : e.offer.is_tentative ? 'Tentative' : 'Pending';
             return (
               <div key={e.show.id} className="card mb-2 cursor-pointer" onClick={() => app.setRoute({ name: 'show', params: { id: e.show.id } })}>
-                <div className="font-semibold">{tour?.title}</div>
-                <div className="text-sm text-gray-600">{e.show.city} · {venue?.name}</div>
-                <div className="text-sm text-gray-500">{formatDateShort(e.show.show_date)} · {e.show.rally_count} rallied</div>
-                <div className="text-xs font-bold mt-1" style={{ color: e.color }}>{status}</div>
+                <div className="text-lg">{tour?.title}</div>
+                <div className="text-sm" style={{ color: 'var(--text2)' }}>{e.show.city} · {venue?.name}</div>
+                <div className="text-xs mt-1" style={{ color: 'var(--text2)', fontFamily: 'var(--mono)', letterSpacing: 1.3, textTransform: 'uppercase' }}>{formatDateShort(e.show.show_date)} · {e.show.rally_count} rallied</div>
+                <div className="mt-2"><span className={`pill ${status === 'Confirmed' ? 'pill-confirmed' : status === 'Tentative' ? 'pill-tentative' : 'pill-rallying'}`}>{status}</span></div>
               </div>
             );
           })
@@ -1459,22 +1772,34 @@ function NotificationsScreen() {
     venue_matched: 'domain', rally_reminder: 'greeting', ticket_available: 'ticket',
     follow_new: 'account', chat_message: 'mic', general: 'bell',
   }[type] ?? 'bell');
+  const hero = notifs.find(n => !n.read && (n.type === 'show_confirmed' || n.type === 'threshold_met'));
+  const feed = notifs.filter(n => n.id !== hero?.id);
   return (
-    <ScreenHeader title="Notifications" onBack={() => app.setRoute({ name: 'tabs' })}>
+    <ScreenHeader title="Dispatches" onBack={() => app.setRoute({ name: 'tabs' })}>
       <div className="p-4">
+        <SectionHeader eyebrow="Dispatches" title="From the" accent="wire." size={38} />
+        {hero && (
+          <div className={`mb-4 ${hero.type === 'show_confirmed' || hero.type === 'threshold_met' ? 'hero-confirm' : 'hero-box'}`}>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: 2, fontWeight: 700, textTransform: 'uppercase', opacity: 0.9 }}>
+              {hero.type === 'show_confirmed' ? 'Confirmed · doors open' : hero.type === 'threshold_met' ? 'Threshold met' : 'Extra · extra'}
+            </div>
+            <div className="text-3xl" style={{ color: '#000', marginTop: 6 }}>{hero.title}</div>
+            <div style={{ marginTop: 8, fontSize: 13, opacity: 0.9 }}>{hero.body}</div>
+          </div>
+        )}
         {notifs.length === 0 ? (
-          <div className="card text-center py-10">No notifications yet</div>
+          <div className="card text-center py-10" style={{ color: 'var(--text2)' }}>No notifications yet</div>
         ) : (
-          notifs.map(n => (
+          feed.map(n => (
             <div key={n.id} className="card mb-2 flex gap-3 items-start cursor-pointer" onClick={() => app.markNotificationRead(n.id)}
               style={{ borderLeft: n.read ? 'none' : '3px solid var(--primary)' }}>
               <Icon name={iconFor(n.type)} size={20} color="var(--primary)" />
               <div className="flex-1">
-                <div className="font-semibold text-sm">{n.title}</div>
-                <div className="text-sm text-gray-600 mt-0.5">{n.body}</div>
-                <div className="text-xs text-gray-400 mt-1">{new Date(n.created_at).toLocaleString()}</div>
+                <div className="text-lg" style={{ fontSize: 16 }}>{n.title}</div>
+                <div className="text-sm" style={{ color: 'var(--text2)', marginTop: 2 }}>{n.body}</div>
+                <div className="text-xs" style={{ color: 'var(--text2)', fontFamily: 'var(--mono)', letterSpacing: 1.3, textTransform: 'uppercase', marginTop: 6 }}>{new Date(n.created_at).toLocaleString()}</div>
               </div>
-              {!n.read && <div className="w-2 h-2 rounded-full" style={{ background: 'var(--primary)' }} />}
+              {!n.read && <div className="w-2 h-2 rounded-full" style={{ background: 'var(--primary)', boxShadow: '0 0 6px rgba(255,91,20,0.8)' }} />}
             </div>
           ))
         )}
@@ -1493,61 +1818,214 @@ function TourDetailScreen({ tourId }) {
   const talentProfile = data.profiles.find(p => p.id === talent?.owner_id);
   const shows = data.shows.filter(s => s.tour_id === tourId).sort((a, b) => a.show_date.localeCompare(b.show_date));
   const isOwner = myTalents.some(mt => mt.id === tour.talent_id);
+  const isFollowingTalent = talentProfile ? app.isFollowing(talentProfile.id) : false;
+
+  const totalRally  = shows.reduce((a, s) => a + (s.rally_count ?? 0), 0);
+  const totalTarget = shows.length * 50;
+  const totalRallyBulbs = Math.min(24, Math.round((totalRally / Math.max(1, totalTarget)) * 24));
+  const routeStops  = Array.from(new Set(shows.map(s => `${s.city.toUpperCase()}, ${s.region}`)));
+
+  // Find the user's home-city stop (if any) so the CTA can take them
+  // straight to the rally moment that actually matters to them.
+  const myCityStop = me?.city
+    ? shows.find(s => s.city?.toLowerCase() === me.city.toLowerCase())
+    : null;
+
+  // Split title into one-word-per-line poster lines. Last line gets the
+  // accent color + period to land the headline.
+  const titleWords = tour.title.split(/\s+/).filter(Boolean);
+  const titleLines = titleWords.length <= 4 ? titleWords : [titleWords.slice(0, -1).join(' '), titleWords.slice(-1)[0]];
 
   return (
-    <ScreenHeader title="Tour" onBack={() => window.history.back()}>
-      <div className="p-4">
-        <div className="card">
-          <div className="font-bold text-xl">{tour.title}</div>
-          <div className="flex items-center gap-2 mt-2">
-            <div className="text-indigo-600 font-semibold cursor-pointer" onClick={() => app.setRoute({ name: 'talent', params: { id: talent.id } })}>
-              {talentProfile?.display_name}
-            </div>
-            {!isOwner && talentProfile && (
-              <button className={`chip ${app.isFollowing(talentProfile.id) ? 'chip-sel' : ''}`} onClick={() => app.toggleFollow(talentProfile.id)}>
-                {app.isFollowing(talentProfile.id) ? 'Following' : 'Follow'}
-              </button>
-            )}
+    <ScreenHeader title="Tour" onBack={() => app.goBack()}>
+      <div style={{ paddingBottom: 28 }}>
+        {/* ── Hero poster ──────────────────────────── */}
+        <div className="px-5 pt-2">
+          <div style={{ fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: 2, color: 'var(--primary)', fontWeight: 700, textTransform: 'uppercase' }}>
+            {(talentProfile?.display_name ?? '').toUpperCase()} PRESENTS
           </div>
-          <div className="text-sm text-gray-600 mt-2">{tour.description}</div>
-          <div className="text-sm font-semibold mt-2">{formatDateShort(tour.start_date)} → {formatDateShort(tour.end_date)}</div>
-          <div className="flex gap-4 mt-3 pt-3 border-t border-gray-200">
-            <div>
-              <div className="text-xs text-gray-500">Ticket</div>
-              <div className="font-bold">${tour.ticket_price}</div>
-            </div>
-            <div>
-              <div className="text-xs text-gray-500">Rally VIP ({tour.rally_discount_pct}% off)</div>
-              <div className="font-bold text-green-600">${(tour.ticket_price * (1 - tour.rally_discount_pct / 100)).toFixed(2)}</div>
-            </div>
+
+          <div style={{
+            fontFamily: 'var(--display)', fontWeight: 900, fontSize: 72,
+            lineHeight: 0.86, letterSpacing: -3.5,
+            textTransform: 'uppercase', color: 'var(--text)',
+            marginTop: 10,
+          }}>
+            {titleLines.map((line, i) => {
+              const isLast = i === titleLines.length - 1;
+              return (
+                <div key={i} style={isLast ? { color: 'var(--primary)' } : null}>
+                  {line}{isLast ? '.' : ''}
+                </div>
+              );
+            })}
           </div>
-          {tour.vip_perks && (
-            <div className="mt-3 p-2.5 rounded-lg flex gap-2" style={{ background: 'var(--warning)15' }}>
-              <Icon name="star" size={16} color="var(--warning)" />
-              <div>
-                <div className="font-bold text-xs" style={{ color: 'var(--warning)' }}>Rally VIP Perks</div>
-                <div className="text-xs">{tour.vip_perks}</div>
-              </div>
-            </div>
-          )}
+
+          <div style={{
+            fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: 2,
+            textTransform: 'uppercase', color: 'var(--text2)', marginTop: 14,
+          }}>
+            TOUR · {formatDateShort(tour.start_date) || '—'} → {formatDateShort(tour.end_date) || '—'} · {shows.length} STOPS
+          </div>
         </div>
 
-        <div className="font-bold mt-4 mb-2">Shows ({shows.length})</div>
-        {shows.map(s => {
-          const venue = s.venue_id ? data.venues.find(v => v.id === s.venue_id) : null;
-          return (
-            <div key={s.id} className="card mb-2 cursor-pointer" onClick={() => app.setRoute({ name: 'show', params: { id: s.id } })}>
-              <div className="flex items-center justify-between mb-1">
-                <div className="font-semibold">{formatDateShort(s.show_date)}</div>
-                <StatusChip status={s.status} />
-              </div>
-              <div className="text-sm text-gray-600">{s.city}, {s.region}</div>
-              <div className="text-sm text-gray-500">{venue?.name ?? 'Venue TBD'}</div>
-              <div className="text-xs text-indigo-600 font-semibold mt-1">{s.rally_count} rallied</div>
+        {/* Ticker tape */}
+        {routeStops.length > 0 && (
+          <div className="mt-5">
+            <Ticker stops={routeStops} />
+          </div>
+        )}
+
+        {/* ── Headline numbers ─────────────────────── */}
+        <div className="px-5 pt-5" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 12 }}>
+          <div style={{ background: 'var(--surface)', borderRadius: 14, padding: 16, border: '1px solid var(--rule)' }}>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: 1.5, color: 'var(--text2)', fontWeight: 700 }}>RALLIED</div>
+            <div style={{
+              fontFamily: 'var(--display)', fontSize: 44, fontWeight: 900,
+              letterSpacing: -1.5, lineHeight: 1, marginTop: 4, color: 'var(--text)',
+            }}>
+              {totalRally}<span style={{ color: 'var(--text2)', fontSize: 22 }}>/{totalTarget}</span>
             </div>
-          );
-        })}
-        <div className="h-8" />
+            <div className="bulbs" style={{ marginTop: 10 }}>
+              {Array.from({ length: 24 }).map((_, i) => (
+                <div key={i} className={`bulb ${i < totalRallyBulbs ? 'on' : ''}`} style={{ width: 8, height: 8 }} />
+              ))}
+            </div>
+          </div>
+
+          <div style={{ background: 'var(--primary)', color: '#000', borderRadius: 14, padding: 16, boxShadow: '0 12px 28px rgba(255,91,20,0.32)' }}>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: 1.5, fontWeight: 700 }}>TICKETS</div>
+            <div style={{
+              fontFamily: 'var(--display)', fontSize: 44, fontWeight: 900,
+              letterSpacing: -1.5, lineHeight: 1, marginTop: 4,
+            }}>
+              ${tour.ticket_price}
+            </div>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 10, fontWeight: 700, letterSpacing: 1.2, marginTop: 6 }}>
+              −{tour.rally_discount_pct}% RALLY DISCOUNT
+            </div>
+          </div>
+        </div>
+
+        {/* Description */}
+        {tour.description && (
+          <div className="px-5 mt-5">
+            <div className="text-sm" style={{ color: 'var(--text2)', lineHeight: 1.5 }}>{tour.description}</div>
+          </div>
+        )}
+
+        {/* VIP perks */}
+        {tour.vip_perks && (
+          <div className="px-5 mt-3">
+            <div style={{
+              borderRadius: 14, padding: 14, border: '1px solid var(--warning)',
+              background: 'rgba(255,200,87,0.08)', display: 'flex', gap: 10,
+            }}>
+              <Icon name="star" size={18} color="var(--warning)" />
+              <div>
+                <div style={{ fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: 2, color: 'var(--warning)', fontWeight: 700 }}>RALLY VIP PERKS</div>
+                <div className="text-sm" style={{ marginTop: 4 }}>{tour.vip_perks}</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Numbered stops list ──────────────────── */}
+        <div className="px-5 mt-6">
+          <div style={{ fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: 2, color: 'var(--text2)', fontWeight: 700, marginBottom: 6 }}>
+            THE ROUTE
+          </div>
+          {shows.map((s, i) => {
+            const venue = s.venue_id ? data.venues.find(v => v.id === s.venue_id) : null;
+            const confirmed = s.status === 'confirmed';
+            const tentative = s.status === 'tentative_venue';
+            const target = 50;
+            const lit = Math.round(Math.min(1, (s.rally_count ?? 0) / target) * 18);
+            const numColor = confirmed ? 'var(--success)' : tentative ? 'var(--warning)' : s.status === 'gathering' ? 'var(--primary)' : 'var(--text2)';
+            const isMyCity = me?.city && s.city?.toLowerCase() === me.city.toLowerCase();
+
+            return (
+              <div
+                key={s.id}
+                onClick={() => app.setRoute({ name: 'show', params: { id: s.id } })}
+                style={{
+                  display: 'grid', gridTemplateColumns: '40px 1fr auto',
+                  gap: 12, alignItems: 'center',
+                  padding: '14px 0',
+                  borderTop: i > 0 ? '1px solid var(--rule)' : 'none',
+                  cursor: 'pointer',
+                  position: 'relative',
+                }}
+              >
+                {/* Big numbered prefix */}
+                <div style={{
+                  fontFamily: 'var(--display)', fontWeight: 900, fontSize: 24, letterSpacing: -0.6,
+                  color: numColor, lineHeight: 1,
+                }}>
+                  {String(i + 1).padStart(2, '0')}
+                </div>
+
+                {/* City + venue + bulbs */}
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+                    <div style={{ fontFamily: 'var(--display)', fontSize: 18, fontWeight: 800, letterSpacing: -0.5, color: 'var(--text)' }}>
+                      {s.city.toUpperCase()}, {s.region}
+                    </div>
+                    {isMyCity && (
+                      <span style={{ fontFamily: 'var(--mono)', fontSize: 9, letterSpacing: 1.3, color: 'var(--primary)', fontWeight: 700, padding: '2px 6px', border: '1px solid var(--primary)', borderRadius: 999 }}>
+                        YOUR CITY
+                      </span>
+                    )}
+                    <div style={{ fontFamily: 'var(--mono)', fontSize: 10, color: 'var(--text2)', letterSpacing: 1 }}>
+                      {formatDateShort(s.show_date).toUpperCase()}
+                    </div>
+                  </div>
+                  <div style={{ fontFamily: 'var(--sans)', fontSize: 12, color: 'var(--text2)', marginTop: 2 }}>
+                    {venue?.name ?? 'venue TBD'}
+                  </div>
+                  <div className="bulbs" style={{ marginTop: 8 }}>
+                    {Array.from({ length: 18 }).map((_, j) => (
+                      <div key={j} className={`bulb ${j < lit ? 'on' : ''} ${confirmed && j < lit ? 'full' : ''}`}
+                        style={{ width: 6, height: 6 }} />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Count + status indicator */}
+                <div style={{ textAlign: 'right', minWidth: 76 }}>
+                  <div style={{ fontFamily: 'var(--display)', fontSize: 18, fontWeight: 800, color: 'var(--text)', lineHeight: 1 }}>
+                    {s.rally_count}<span style={{ color: 'var(--text2)', fontSize: 11 }}>/{target}</span>
+                  </div>
+                  {confirmed && <div style={{ fontFamily: 'var(--mono)', fontSize: 9, color: 'var(--success)', marginTop: 5, letterSpacing: 1.2, fontWeight: 700 }}>● CONFIRMED</div>}
+                  {tentative && <div style={{ fontFamily: 'var(--mono)', fontSize: 9, color: 'var(--warning)', marginTop: 5, letterSpacing: 1.2, fontWeight: 700 }}>○ TENTATIVE</div>}
+                  {s.status === 'gathering' && <div style={{ fontFamily: 'var(--mono)', fontSize: 9, color: 'var(--primary)', marginTop: 5, letterSpacing: 1.2, fontWeight: 700 }}>GATHERING</div>}
+                  {s.status === 'proposed' && <div style={{ fontFamily: 'var(--mono)', fontSize: 9, color: 'var(--text2)', marginTop: 5, letterSpacing: 1.2 }}>PROPOSED</div>}
+                  {s.status === 'sold_out' && <div style={{ fontFamily: 'var(--mono)', fontSize: 9, color: 'var(--primary)', marginTop: 5, letterSpacing: 1.2, fontWeight: 700 }}>SOLD OUT</div>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* ── Bottom CTAs ──────────────────────────── */}
+        {!isOwner && (
+          <div className="px-5 mt-6" style={{ display: 'grid', gap: 10 }}>
+            {myCityStop && (
+              <button
+                className="btn-hero btn-hero-orange"
+                onClick={() => app.setRoute({ name: 'show', params: { id: myCityStop.id } })}
+              >
+                Rally for {myCityStop.city} →
+              </button>
+            )}
+            <button
+              className={`btn-hero ${isFollowingTalent ? 'btn-hero-outline' : 'btn-hero-bone'}`}
+              onClick={() => talentProfile && app.toggleFollow(talentProfile.id)}
+            >
+              {isFollowingTalent ? 'Following' : `Follow ${talentProfile?.display_name ?? 'tour'}`}
+            </button>
+          </div>
+        )}
       </div>
     </ScreenHeader>
   );
@@ -1574,25 +2052,46 @@ function ShowDetailScreen({ showId }) {
   const following = app.isFollowingShow(show.id);
   const isConfirmed = show.status === 'confirmed';
 
+  const pct = Math.min(100, Math.round(show.rally_count / 50 * 100));
+
   return (
-    <ScreenHeader title="Show" onBack={() => window.history.back()}>
+    <ScreenHeader title="Show" onBack={() => app.goBack()}>
       <div className="p-4">
-        <div className="card">
-          <div className="font-bold text-xl">{formatDateFull(show.show_date)}</div>
-          <div className="text-sm text-gray-500">{show.start_time}</div>
-          <div className="flex items-center gap-2 mt-3">
-            <div className="text-indigo-600 font-semibold cursor-pointer" onClick={() => tour && app.setRoute({ name: 'tour', params: { id: tour.id } })}>
-              {talentProfile?.display_name}
+        {/* Playbill header */}
+        <div className="eyebrow" style={{ marginBottom: 6 }}>One night only · {show.city}, {show.region}</div>
+        <div className="text-4xl cursor-pointer" onClick={() => tour && app.setRoute({ name: 'tour', params: { id: tour.id } })}>{talentProfile?.display_name}</div>
+        {tour && <div className="text-sm" style={{ color: 'var(--text2)', marginTop: 6 }}>from <span style={{ color: 'var(--text)' }}>{tour.title}</span></div>}
+
+        {/* Date + doors chip */}
+        <div className="flex items-center gap-4 mt-4 mb-4" style={{ padding: '12px 16px', border: '1px solid var(--rule)', borderRadius: 14, background: 'var(--surface)', width: 'fit-content' }}>
+          <div>
+            <div className="eyebrow eyebrow-dim">{new Date(show.show_date).toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase()}</div>
+            <div className="text-2xl">{formatDateShort(show.show_date)}</div>
+          </div>
+          <div style={{ width: 1, height: 36, background: 'var(--rule)' }} />
+          <div>
+            <div className="eyebrow eyebrow-dim">Doors</div>
+            <div className="text-2xl">{show.start_time ?? '8:00'}</div>
+          </div>
+        </div>
+
+        <div className="mb-3"><StatusChip status={show.status} /></div>
+
+        {/* Rally hero */}
+        <div className="card mb-3">
+          <div className="flex items-center justify-between mb-2">
+            <div className="eyebrow">The Rally</div>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: 1.2, color: 'var(--text2)' }}>
+              {show.rally_count >= 50 ? 'THRESHOLD MET' : `NEEDS ${50 - show.rally_count} MORE`}
             </div>
           </div>
-          <div className="text-sm text-gray-500 mt-1">{show.city}, {show.region}</div>
-          {tour && <div className="text-sm text-gray-600 mt-2 pt-2 border-t border-gray-200">{tour.title}</div>}
-          <div className="mt-2"><StatusChip status={show.status} /></div>
-          <div className="mt-3 pt-3 border-t border-gray-200">
-            <div className="text-xs text-gray-500 mb-1">Fan demand: {show.rally_count} rallied</div>
-            <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div className="h-full" style={{ width: `${Math.min(100, (show.rally_count / 50) * 100)}%`, background: 'var(--primary)' }} />
-            </div>
+          <div className="flex items-baseline gap-2">
+            <div style={{ fontFamily: 'var(--display)', fontSize: 88, fontWeight: 900, letterSpacing: -3.5, lineHeight: 0.86, color: isConfirmed ? 'var(--success)' : 'var(--primary)' }}>{show.rally_count}</div>
+            <div style={{ fontFamily: 'var(--display)', fontSize: 28, fontWeight: 700, letterSpacing: -0.8, color: 'var(--text2)' }}>/ 50</div>
+          </div>
+          <div className="eyebrow eyebrow-dim" style={{ marginTop: 2 }}>Commitments · {pct}% of room</div>
+          <div className="mt-3">
+            <RallyBulbs current={show.rally_count} threshold={50} showCount={false} />
           </div>
         </div>
 
@@ -1610,40 +2109,68 @@ function ShowDetailScreen({ showId }) {
           ) : <div className="text-sm text-gray-500">No venue assigned yet</div>}
         </div>
 
-        {/* Fan actions */}
-        {!isOwner && (
-          <div className="card mt-3 flex gap-2 flex-wrap">
-            <button className={`btn ${following ? 'btn-outlined' : 'btn-text'}`} onClick={() => app.toggleShowFollow(show.id, show.tour_id)}>
-              <Icon name="bell" size={14} /> {following ? 'Following' : 'Follow'}
-            </button>
-            {!isConfirmed && (
-              <button className={`btn ${rallied ? 'btn-outlined' : 'btn-primary'}`} style={rallied ? { borderColor: 'var(--success)', color: 'var(--success)' } : {}} onClick={() => app.toggleRally(show.id)}>
-                <Icon name={rallied ? 'checkCircle' : 'greeting'} size={14} /> {rallied ? 'Rallied! (VIP)' : 'Rally!'}
+        {/* Fan actions — square hero CTAs side-by-side */}
+        {!isOwner && (() => {
+          const ticketed   = app.hasTicket(show.id);
+          const rallyPrice = Math.round((show.ticket_price ?? 0) * (1 - (tour?.rally_discount_pct ?? 0) / 100));
+          const fullPrice  = Math.round(show.ticket_price ?? 0);
+          const buyPrice   = rallied ? rallyPrice : fullPrice;
+          return (
+            <div className="mt-4" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              {!isConfirmed ? (
+                <button
+                  className={`btn-hero ${rallied ? 'btn-hero-outline' : 'btn-hero-orange'}`}
+                  style={{ minHeight: 84, padding: '22px 16px', borderRadius: 14 }}
+                  onClick={() => app.toggleRally(show.id)}
+                >
+                  <Icon name={rallied ? 'checkCircle' : 'greeting'} size={18} />
+                  {rallied ? `Rallied · $${rallyPrice}` : `Rally · $${rallyPrice}`}
+                </button>
+              ) : (
+                <button
+                  className={`btn-hero ${ticketed ? 'btn-hero-outline' : 'btn-hero-orange'}`}
+                  style={{ minHeight: 84, padding: '22px 16px', borderRadius: 14 }}
+                  onClick={() => !ticketed && app.buyTicket(show.id)}
+                >
+                  <Icon name={ticketed ? 'checkCircle' : 'ticket'} size={18} />
+                  {ticketed ? 'Ticket secured' : `Buy · $${buyPrice}`}
+                </button>
+              )}
+              <button
+                className={`btn-hero ${following ? 'btn-hero-outline' : 'btn-hero-bone'}`}
+                style={{ minHeight: 84, padding: '22px 16px', borderRadius: 14 }}
+                onClick={() => app.toggleShowFollow(show.id, show.tour_id)}
+              >
+                <Icon name="bell" size={18} />
+                {following ? 'Following' : 'Follow'}
               </button>
-            )}
-            {isConfirmed && (
-              <button className="btn btn-primary">
-                <Icon name="ticket" size={14} /> Buy Ticket — ${rallied ? (show.ticket_price * 0.8).toFixed(2) : show.ticket_price}
-              </button>
-            )}
-          </div>
-        )}
+            </div>
+          );
+        })()}
 
-        {/* Talent: venue offers */}
-        {isOwner && !isConfirmed && (
-          <>
-            {venueOffers.length > 0 && (
+        {/* Talent: incoming offers + their own outgoing requests */}
+        {isOwner && !isConfirmed && (() => {
+          const pendingOffers   = venueOffers.filter(o => !o.requested_by_talent);
+          const pendingRequests = venueOffers.filter(o => o.requested_by_talent);
+          return (
+            <>
               <div className="card mt-3">
-                <div className="font-semibold mb-2">Venue Offers ({venueOffers.length})</div>
-                {venueOffers.map(o => {
+                <div className="font-semibold mb-2">Incoming offers ({pendingOffers.length})</div>
+                {pendingOffers.length === 0 ? (
+                  <div className="text-sm" style={{ color: 'var(--text2)' }}>No offers from hosts yet</div>
+                ) : pendingOffers.map(o => {
                   const v = data.venues.find(vv => vv.id === o.venue_id);
                   return (
                     <div key={o.id} className="flex items-center py-2 border-b last:border-0">
                       <div className="flex-1">
                         <div className="font-semibold text-sm">{v?.name}</div>
-                        <div className="text-xs text-gray-500">{v?.capacity} cap · ${v?.price_per_night}/night</div>
+                        <div className="text-xs" style={{ color: 'var(--text2)' }}>{v?.capacity} cap · ${v?.price_per_night}/night</div>
                       </div>
-                      <button className="btn btn-primary text-xs mr-1" style={{ background: 'var(--success)' }} onClick={() => app.confirmVenueForShow(show.id, v.id, v.capacity)}>
+                      <button
+                        className="btn text-xs mr-1"
+                        style={{ background: 'var(--secondary)', color: '#000', fontWeight: 700 }}
+                        onClick={() => app.confirmVenueForShow(show.id, v.id, v.capacity)}
+                      >
                         Confirm
                       </button>
                       <button className="p-2" onClick={() => app.rejectOffer(o.id)}>
@@ -1653,32 +2180,52 @@ function ShowDetailScreen({ showId }) {
                   );
                 })}
               </div>
-            )}
 
-            <div className="card mt-3">
-              <div className="font-semibold mb-2">Find a Venue</div>
-              {matchingVenues.length === 0 ? (
-                <div className="text-sm text-gray-500">No matching venues in {show.city}</div>
-              ) : (
-                matchingVenues.slice(0, 6).map(v => {
-                  const alreadyRequested = data.venue_offers.some(o => o.venue_id === v.id && o.show_id === show.id);
-                  const vtInfo = VENUE_TYPES.find(vt => vt.value === v.venue_type);
-                  return (
-                    <div key={v.id} className="flex items-center py-2 border-b last:border-0">
-                      <div className="flex-1">
-                        <div className="font-semibold text-sm">{v.name}</div>
-                        <div className="text-xs text-gray-500">{vtInfo?.label} · {v.capacity} cap · ${v.price_per_night}/night</div>
+              {pendingRequests.length > 0 && (
+                <div className="card mt-3">
+                  <div className="font-semibold mb-2">Awaiting host ({pendingRequests.length})</div>
+                  {pendingRequests.map(o => {
+                    const v = data.venues.find(vv => vv.id === o.venue_id);
+                    return (
+                      <div key={o.id} className="flex items-center py-2 border-b last:border-0">
+                        <div className="flex-1">
+                          <div className="font-semibold text-sm">{v?.name}</div>
+                          <div className="text-xs" style={{ color: 'var(--text2)' }}>{v?.capacity} cap · ${v?.price_per_night}/night</div>
+                        </div>
+                        <button className="btn btn-text text-xs" style={{ color: 'var(--error)' }} onClick={() => app.cancelVenueOffer(o.id)}>
+                          Cancel
+                        </button>
                       </div>
-                      <button className="btn btn-outlined text-xs" disabled={alreadyRequested} onClick={() => app.offerVenue(v.id, show.id)}>
-                        {alreadyRequested ? 'Requested' : 'Request'}
-                      </button>
-                    </div>
-                  );
-                })
+                    );
+                  })}
+                </div>
               )}
-            </div>
-          </>
-        )}
+
+              <div className="card mt-3">
+                <div className="font-semibold mb-2">Find a Venue</div>
+                {matchingVenues.length === 0 ? (
+                  <div className="text-sm" style={{ color: 'var(--text2)' }}>No matching venues in {show.city}</div>
+                ) : (
+                  matchingVenues.slice(0, 6).map(v => {
+                    const alreadyRequested = data.venue_offers.some(o => o.venue_id === v.id && o.show_id === show.id && o.status === 'pending');
+                    const vtInfo = VENUE_TYPES.find(vt => vt.value === v.venue_type);
+                    return (
+                      <div key={v.id} className="flex items-center py-2 border-b last:border-0">
+                        <div className="flex-1">
+                          <div className="font-semibold text-sm">{v.name}</div>
+                          <div className="text-xs" style={{ color: 'var(--text2)' }}>{vtInfo?.label} · {v.capacity} cap · ${v.price_per_night}/night</div>
+                        </div>
+                        <button className="btn btn-outlined text-xs" disabled={alreadyRequested} onClick={() => app.requestVenue(v.id, show.id)}>
+                          {alreadyRequested ? 'Requested' : 'Request'}
+                        </button>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </>
+          );
+        })()}
 
         {/* Host: offer your venue */}
         {isHost && !isOwner && !isConfirmed && (
@@ -2006,7 +2553,7 @@ function TalentDetailScreen({ talentId }) {
   const followers = app.data.follows.filter(f => f.following_id === profile?.id).length;
 
   return (
-    <ScreenHeader title="Talent" onBack={() => window.history.back()}>
+    <ScreenHeader title="Talent" onBack={() => app.goBack()}>
       <div className="p-4">
         <div className="card text-center">
           <Avatar name={profile?.display_name} size={72} />
@@ -2042,7 +2589,7 @@ function VenueDetailScreen({ venueId }) {
   const typeInfo = VENUE_TYPES.find(vt => vt.value === venue.venue_type);
 
   return (
-    <ScreenHeader title="Venue" onBack={() => window.history.back()}>
+    <ScreenHeader title="Venue" onBack={() => app.goBack()}>
       <div className="p-4">
         <div className="card">
           <div className="flex items-center justify-between">
@@ -2091,17 +2638,16 @@ function VenueDetailScreen({ venueId }) {
 // REUSABLE LAYOUT COMPONENTS
 // ============================================================
 const Stat = ({ num, label }) => (
-  <div>
-    <div className="text-xl font-bold">{num}</div>
-    <div className="text-xs text-gray-500">{label}</div>
+  <div className="stat">
+    <div className="num">{num}</div>
+    <div className="lbl">{label}</div>
   </div>
 );
 
 const Section = ({ title, count, children }) => (
-  <div className="mt-4">
+  <div className="mt-5">
     <div className="flex items-center justify-between mb-2">
-      <div className="font-bold">{title}</div>
-      {count !== undefined && <div className="text-xs text-gray-500">{count}</div>}
+      <div className="eyebrow">{title}{count !== undefined ? ` · ${count}` : ''}</div>
     </div>
     {children}
   </div>
@@ -2151,10 +2697,10 @@ function ShowCard({ show }) {
 
 function ScreenHeader({ title, onBack, children }) {
   return (
-    <div className="flex flex-col h-full bg-gray-50">
-      <div className="flex items-center px-2 py-3 bg-white border-b border-gray-200">
-        <button onClick={onBack} className="p-2"><Icon name="chevronLeft" size={22} /></button>
-        <div className="flex-1 font-bold text-lg">{title}</div>
+    <div className="flex flex-col h-full" style={{ background: 'var(--bg)' }}>
+      <div className="flex items-center px-2 py-3" style={{ background: 'var(--bg)', borderBottom: '1.5px solid var(--rule)' }}>
+        <button onClick={onBack} className="p-2"><Icon name="chevronLeft" size={22} color="var(--text)" /></button>
+        <div className="flex-1 font-bold text-lg" style={{ fontFamily: 'var(--display)', letterSpacing: -0.5, textTransform: 'uppercase' }}>{title}</div>
       </div>
       <div className="flex-1 overflow-y-auto">{children}</div>
     </div>
@@ -2174,9 +2720,9 @@ function TabBar() {
     { key: 'commitments', label: 'Upcoming', icon: 'calendar', show: role === 'fan' },
     { key: 'tours', label: 'Tours', icon: 'bus', show: role === 'talent' },
     { key: 'dashboard', label: 'Dashboard', icon: 'dashboard', show: role === 'talent' },
-    { key: 'host-explore', label: 'Explore', icon: 'compass', show: role === 'venue' },
-    { key: 'venues', label: 'My Venues', icon: 'domain', show: role === 'venue' },
-    { key: 'bookings', label: 'Bookings', icon: 'checkCircle', show: role === 'venue' },
+    { key: 'host-explore', label: 'Explore', icon: 'compass', show: role === 'host' },
+    { key: 'venues', label: 'My Venues', icon: 'domain', show: role === 'host' },
+    { key: 'bookings', label: 'Bookings', icon: 'checkCircle', show: role === 'host' },
   ].filter(t => t.show);
 
   return (

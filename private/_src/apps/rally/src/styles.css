@@ -1,29 +1,177 @@
 @import "tailwindcss";
 
-:root {
-    --primary: #6C63FF; --primary-dark: #5A52D5; --secondary: #FF6584;
-    --bg: #F8F9FA; --surface: #FFFFFF; --text: #1A1A2E; --text2: #6B7280;
-    --border: #E5E7EB; --success: #10B981; --warning: #F59E0B; --error: #EF4444;
+/* ── Marquee palette — warm near-black stage, hot orange, neon confirm ── */
+  :root {
+    --primary: #FF5B14; --primary-dark: #D44A0E; --secondary: #B6FF3D;
+    --bg: #14110E; --surface: #1E1A16; --surface-2: #282320;
+    --text: #F1ECDF; --text2: #8A8275;
+    --border: #2A2621; --rule: #2A2621;
+    --success: #B6FF3D; --warning: #FFC857; --error: #FF3D7F;
+    --display: "Archivo", "Inter", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    --sans: "Inter", system-ui, -apple-system, sans-serif;
   }
-  html, body, #root { height: 100%; margin: 0; background: var(--bg); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--text); }
+  html, body, #root { height: 100%; margin: 0; background: var(--bg); font-family: var(--sans); color: var(--text); }
   * { -webkit-tap-highlight-color: transparent; }
-  .phone { max-width: 440px; margin: 0 auto; height: 100vh; display: flex; flex-direction: column; background: var(--bg); box-shadow: 0 0 40px rgba(0,0,0,.1); position: relative; }
+  /* Tailwind gray utilities → retuned to bone/dim for dark theme */
+  .text-gray-500, .text-gray-600 { color: var(--text2) !important; }
+  .text-gray-400 { color: var(--text2) !important; opacity: 0.8; }
+  .text-gray-700 { color: var(--text) !important; }
+  .text-indigo-500, .text-indigo-600 { color: var(--primary) !important; font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; }
+  .text-green-600 { color: var(--success) !important; }
+  .bg-gray-200 { background: var(--border) !important; }
+  .bg-gray-100 { background: var(--surface-2) !important; }
+  .bg-gray-50  { background: var(--surface) !important; }
+  .border-gray-200 { border-color: var(--rule) !important; }
+  .border-gray-100 { border-color: var(--rule) !important; }
+
+  .phone { max-width: 440px; margin: 0 auto; height: 100vh; display: flex; flex-direction: column; background: var(--bg); box-shadow: 0 0 80px rgba(0,0,0,.6); position: relative; }
   .screen { flex: 1; overflow-y: auto; overflow-x: hidden; }
-  .tab-bar { display: flex; background: white; border-top: 1px solid var(--border); padding: 4px 0 20px; }
-  .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; cursor: pointer; border: none; background: transparent; }
-  .tab-active { color: var(--primary); }
+
+  /* ── Display typography (Archivo grotesk, kinetic) ── */
+  .font-display { font-family: var(--display) !important; font-weight: 700; letter-spacing: -0.5px; }
+  .font-mono    { font-family: var(--mono) !important; letter-spacing: 1.3px; text-transform: uppercase; }
+  .font-bold, .font-semibold { font-family: var(--display); letter-spacing: -0.3px; }
+  .text-xs  { font-size: 11px; }
+  .text-sm  { font-size: 13px; }
+  .text-base{ font-size: 15px; }
+  .text-lg  { font-family: var(--display); font-size: 20px; font-weight: 800; letter-spacing: -0.4px; }
+  .text-xl  { font-family: var(--display); font-size: 26px; font-weight: 800; letter-spacing: -0.7px; line-height: 1.05; }
+  .text-2xl { font-family: var(--display); font-size: 34px; font-weight: 900; letter-spacing: -1.2px; line-height: 1; }
+  .text-3xl { font-family: var(--display); font-size: 44px; font-weight: 900; letter-spacing: -1.8px; line-height: 0.95; }
+  .text-4xl { font-family: var(--display); font-size: 56px; font-weight: 900; letter-spacing: -2.5px; line-height: 0.9; }
+
+  /* Pill-shaped chips and buttons — catchy Marquee chrome */
+  .tab-bar { display: flex; background: var(--bg); border-top: 1.5px solid var(--rule); padding: 4px 0 20px; }
+  .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; cursor: pointer; border: none; background: transparent; font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; }
+  .tab-active { color: var(--primary); font-weight: 700; }
+  .tab-active svg { filter: drop-shadow(0 0 6px rgba(255,91,20,0.6)); }
   .tab-inactive { color: var(--text2); }
-  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 14px; background: var(--bg); border: 1px solid var(--border); font-size: 12px; font-weight: 500; }
-  .chip-sel { background: var(--primary); color: white; border-color: var(--primary); }
-  .card { background: white; border-radius: 16px; padding: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
-  .btn { padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-  .btn-primary { background: var(--primary); color: white; }
-  .btn-primary:disabled { background: #B5B2F5; cursor: not-allowed; }
+
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--rule); color: var(--text); font-family: var(--sans); font-size: 12px; font-weight: 600; letter-spacing: 0.2px; text-transform: none; }
+  .chip-sel { background: var(--primary); color: #000; border-color: var(--primary); box-shadow: 0 0 14px rgba(255,91,20,0.45); }
+
+  .card { background: var(--surface); border-radius: 16px; padding: 16px; border: 1px solid var(--rule); box-shadow: none; }
+  .card-accent { background: var(--primary); color: #000; border-radius: 16px; padding: 16px; box-shadow: 0 10px 30px rgba(255,91,20,0.28); }
+
+  /* Standard pill button (used for follow / chip-style actions) */
+  .btn { padding: 12px 20px; border-radius: 999px; font-weight: 700; font-size: 13px; font-family: var(--sans); letter-spacing: 0.2px; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+  .btn-primary { background: var(--primary); color: #000; box-shadow: 0 8px 22px rgba(255,91,20,0.3); }
+  .btn-primary:disabled { background: var(--surface-2); color: var(--text2); cursor: not-allowed; box-shadow: none; }
   .btn-outlined { background: transparent; border: 1.5px solid var(--primary); color: var(--primary); }
-  .btn-text { background: transparent; color: var(--primary); }
-  .input { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 15px; background: white; color: var(--text); box-sizing: border-box; }
-  .input:focus { outline: none; border-color: var(--primary); }
-  .label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; display: block; }
+  .btn-text { background: transparent; color: var(--primary); padding: 6px 10px; }
+
+  /* HERO CTAs — big rectangular buttons with rounded corners, for the
+     "exciting" actions: Rally, Buy Ticket, Commit. Two flavors:
+     orange (primary) and bone (secondary). */
+  .btn-hero {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 18px 24px; border-radius: 16px; border: none; cursor: pointer;
+    font-family: var(--display); font-size: 17px; font-weight: 800;
+    letter-spacing: 0.3px; text-transform: uppercase;
+    width: 100%;
+    transition: transform 80ms ease;
+  }
+  .btn-hero:active { transform: translateY(1px); }
+  .btn-hero-orange {
+    background: var(--primary); color: #000;
+    box-shadow: 0 12px 28px rgba(255,91,20,0.36), inset 0 -3px 0 rgba(0,0,0,0.18);
+  }
+  .btn-hero-orange:disabled { background: var(--surface-2); color: var(--text2); box-shadow: none; cursor: not-allowed; }
+  .btn-hero-bone {
+    background: var(--text); color: #000;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.35), inset 0 -3px 0 rgba(0,0,0,0.12);
+  }
+  .btn-hero-outline {
+    background: transparent; color: var(--text); border: 1.5px solid var(--rule);
+  }
+
+  /* Solid status pills — colored fill, ink-dark text. Used on every
+     ShowCard / Booking row to make status pop ("CONFIRMED" in neon green,
+     "TENTATIVE" in amber, "RALLYING" in hot orange, etc.) */
+  .pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 5px 12px; border-radius: 999px;
+    font-family: var(--mono); font-size: 10px; font-weight: 800;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    line-height: 1;
+  }
+  .pill-confirmed { background: var(--secondary); color: #000; box-shadow: 0 0 12px rgba(182,255,61,0.45); }
+  .pill-tentative { background: var(--warning);   color: #000; }
+  .pill-rallying  { background: var(--primary);   color: #000; box-shadow: 0 0 10px rgba(255,91,20,0.4); }
+  .pill-soldout   { background: var(--magenta, #FF3D7F); color: #000; }
+  .pill-cancelled { background: var(--error);     color: #000; }
+  .pill-muted     { background: var(--surface-2); color: var(--text2); }
+
+  .input { width: 100%; padding: 13px 16px; border: 1px solid var(--rule); border-radius: 12px; font-size: 15px; font-family: var(--sans); background: var(--surface); color: var(--text); box-sizing: border-box; }
+  .input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(255,91,20,0.25); }
+  .input::placeholder { color: var(--text2); }
+  .label { font-size: 10px; font-family: var(--mono); font-weight: 700; color: var(--text2); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; display: block; }
+
+  /* Section header — catchy Marquee eyebrow + big display headline */
+  .eyebrow {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
+    text-transform: uppercase; font-weight: 600; color: var(--primary);
+  }
+  .eyebrow-dim { color: var(--text2); }
+  .headline {
+    font-family: var(--display); font-weight: 900; letter-spacing: -1.5px;
+    line-height: 0.95; color: var(--text); font-size: 40px;
+  }
+  .headline em { color: var(--primary); font-style: normal; }
+
+  /* ── Rally bulbs: the signature marquee viz ── */
+  .bulbs { display: flex; align-items: center; gap: 3px; }
+  .bulb {
+    flex: 1; max-width: 14px; min-width: 4px;
+    height: 10px; border-radius: 999px;
+    border: 1px solid var(--rule); background: transparent;
+    transition: background 120ms, box-shadow 160ms;
+  }
+  .bulb.on {
+    background: var(--primary); border-color: var(--primary);
+    box-shadow: 0 0 6px rgba(255,91,20,0.7);
+  }
+  .bulb.on.full { background: var(--secondary); border-color: var(--secondary);
+    box-shadow: 0 0 10px rgba(182,255,61,0.85); }
+
+  /* Ticker tape — a route strip */
+  .ticker {
+    border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+    padding: 8px 14px; font-family: var(--mono); font-size: 11px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--text); overflow: hidden; white-space: nowrap;
+    background: var(--surface);
+  }
+  .ticker .dot { color: var(--primary); margin: 0 8px; font-weight: 700; }
+
+  /* Wordmark: "Rally." with hot-orange period */
+  .wordmark { font-family: var(--display); font-weight: 900; letter-spacing: -1px; font-size: 28px; color: var(--text); line-height: 1; }
+  .wordmark span { color: var(--primary); }
+
+  /* Hero announcement blocks — big colored cards. Orange = "extra extra"
+     (default), green = celebrate (show confirmed, threshold met),
+     magenta = sold out. */
+  .hero-box {
+    background: var(--primary); color: #000; border-radius: 18px;
+    padding: 18px 18px 20px; box-shadow: 0 10px 30px rgba(255,91,20,0.28);
+    position: relative; overflow: hidden;
+  }
+  .hero-confirm {
+    background: var(--secondary); color: #000; border-radius: 18px;
+    padding: 18px 18px 20px; box-shadow: 0 12px 36px rgba(182,255,61,0.35);
+    position: relative; overflow: hidden;
+  }
+  .hero-magenta {
+    background: var(--error); color: #000; border-radius: 18px;
+    padding: 18px 18px 20px; box-shadow: 0 10px 30px rgba(255,61,127,0.3);
+    position: relative; overflow: hidden;
+  }
+
+  /* Stat cell */
+  .stat { background: var(--surface); border: 1px solid var(--rule); border-radius: 14px; padding: 12px 10px; text-align: center; }
+  .stat .num { font-family: var(--display); font-size: 22px; font-weight: 900; letter-spacing: -0.6px; line-height: 1; color: var(--text); }
+  .stat .lbl { font-family: var(--mono); font-size: 9px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--text2); margin-top: 4px; }
+
   @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   .animate-slide-up { animation: slideUp 0.2s ease-out; }
   .hide-scrollbar::-webkit-scrollbar { display: none; }
