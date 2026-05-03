@@ -1,5 +1,7 @@
 /* Extracted from Claude Design prototype — see scripts/extract.py */
 import React from "react";
+import thesisPdf from "./aji_fund_thesis_v34.pdf";
+
 
 // === goboard.jsx ===
 /* Aji — Go board (Move 37) with animated win-probability narrative. 5s steady loop. */
@@ -66,7 +68,7 @@ const GoBoard = ({ showOverlay = true }) => {
     null,
     { eyebrow: 'Move 37 · value unknowable at the time',
       body: 'Commentators called it a mistake. The engine itself gave it barely better than even odds.' },
-    { eyebrow: 'The shape develops · value accrues',
+    { eyebrow: null,
       body: 'Fifty moves later, the position Move 37 seeded is quietly dictating the board.' },
     { eyebrow: 'The option resolves in the money',
       body: 'The victory traces directly back to a move whose value was invisible when it was played.' },
@@ -88,22 +90,20 @@ const GoBoard = ({ showOverlay = true }) => {
       <div style={{
         position: 'absolute',
         top: 0, left: 0, right: 0,
-        display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end',
+        display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
         fontFamily: 'var(--mono)', fontSize: 11,
         letterSpacing: '0.14em', textTransform: 'uppercase',
         color: 'var(--paper-dim)',
         gap: 24,
       }}>
         <div>
-          <div style={{ color: 'var(--gold)', fontSize: 10, marginBottom: 6, letterSpacing: '0.14em' }}>
-            Game 2 · Lee Sedol (W) vs AlphaGo (B)
-          </div>
+          <div style={{ fontSize: 10, color: 'var(--gold)', marginBottom: 6, letterSpacing: '0.14em' }}>Move</div>
           <div style={{
-            fontSize: 22, color: 'var(--paper)',
-            fontFamily: 'var(--serif)', letterSpacing: '-0.01em',
-            textTransform: 'none',
+            fontSize: 28, color: 'var(--paper)',
+            fontFamily: 'var(--mono)', letterSpacing: 0,
+            fontVariantNumeric: 'tabular-nums',
           }}>
-            Move <span style={{ color: 'var(--gold)', fontVariantNumeric: 'tabular-nums' }}>{moveNum}</span>
+            {moveNum}
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>
@@ -212,38 +212,21 @@ const GoBoard = ({ showOverlay = true }) => {
         </g>
       </svg>
 
-      {/* Off-board caption — flows below the board, fully readable */}
-      {showOverlay && (
+      {/* Static caption */}
+      <div style={{
+        marginTop: 20,
+        borderTop: '1px solid var(--rule)',
+        paddingTop: 16,
+      }}>
         <div style={{
-          marginTop: 20,
-          minHeight: 86,
-          display: 'flex', flexDirection: 'column', gap: 10,
-          borderTop: '1px solid var(--rule)',
-          paddingTop: 16,
+          fontFamily: 'var(--serif)', fontSize: 15,
+          color: 'var(--paper)', lineHeight: 1.55,
+          fontStyle: 'italic',
+          maxWidth: '62ch',
         }}>
-          <div key={`eb-${phase}`} style={{
-            fontFamily: 'var(--mono)', fontSize: 11,
-            letterSpacing: '0.14em', textTransform: 'uppercase',
-            color: 'var(--gold)',
-            opacity: label ? 1 : 0,
-            transition: 'opacity 0.5s',
-            minHeight: 14,
-          }}>
-            {label ? label.eyebrow : '\u00A0'}
-          </div>
-          <div key={`bd-${phase}`} style={{
-            fontFamily: 'var(--serif)', fontSize: 15,
-            color: 'var(--paper)', lineHeight: 1.55,
-            fontStyle: 'italic',
-            maxWidth: '62ch',
-            opacity: label ? 1 : 0,
-            transition: 'opacity 0.5s',
-            minHeight: 46,
-          }}>
-            {label ? label.body : '\u00A0'}
-          </div>
+          Move 37 seemed like a mistake, until it led to AlphaGo's milestone victory.
         </div>
-      )}
+      </div>
     </div>
   );
 };
@@ -545,7 +528,7 @@ const CapacityBuffers = () => {
       </g>
 
       {/* Headroom indicator */}
-      <g transform="translate(330 80)">
+      <g transform="translate(385 80)">
         <text fill="#b8955a" fontSize="9" fontFamily="var(--mono)" letterSpacing="0.1em" textAnchor="end">HEADROOM</text>
         <text y="26" fill="#b8955a" fontSize="28" fontFamily="var(--mono)" textAnchor="end">{9 - activated}</text>
         <text y="42" fill="#b8955a" fontSize="9" fontFamily="var(--mono)" letterSpacing="0.1em" textAnchor="end" opacity="0.7">PRE-PAID</text>
@@ -570,16 +553,20 @@ const StagedDev = () => {
     raf = requestAnimationFrame(loop); return () => cancelAnimationFrame(raf);
   }, []);
 
-  // Decision tree: Phase 1 (single root) → Phase 2 (2 branches) → Phase 3 (4 branches) → Phase 4 (6 leaves, some pruned)
-  // Each phase reveals as t advances. At the end, one path is highlighted in gold.
+  // Two-phase animation:
+  //   Phase A (t in [0, 0.5]): build the OPEN tree, P1 → P2 → P3 → P4. All nodes open.
+  //   Phase B (t in [0.5, 0.95]): commit one segment + abandon siblings, step by step.
+  //   Tail (t > 0.95): hold final state briefly, then loop.
   const phases = [
-    { x: 60, reveal: 0.0 },
-    { x: 145, reveal: 0.2 },
-    { x: 230, reveal: 0.45 },
-    { x: 315, reveal: 0.7 },
+    { x: 60, reveal: 0.00 },  // P1 nodes
+    { x: 145, reveal: 0.10 }, // P2 nodes
+    { x: 230, reveal: 0.22 }, // P3 nodes
+    { x: 315, reveal: 0.36 }, // P4 nodes
   ];
+  // After 0.5, decide one phase commit at a time.
+  const commitTicks = [0.50, 0.62, 0.75, 0.88]; // when each segment commits
 
-  // Nodes at each phase [y positions]
+  // Nodes at each phase
   const tree = [
     [{ y: 150, id: 'p1' }],
     [{ y: 100, id: 'p2a', parent: 'p1' }, { y: 200, id: 'p2b', parent: 'p1' }],
@@ -590,21 +577,54 @@ const StagedDev = () => {
       { y: 230, id: 'p3d', parent: 'p2b' },
     ],
     [
-      { y: 55,  id: 'p4a', parent: 'p3a', pruned: true },
+      { y: 55,  id: 'p4a', parent: 'p3a' },
       { y: 90,  id: 'p4b', parent: 'p3a' },
       { y: 130, id: 'p4c', parent: 'p3b' },
-      { y: 165, id: 'p4d', parent: 'p3b', pruned: true },
+      { y: 165, id: 'p4d', parent: 'p3b' },
       { y: 200, id: 'p4e', parent: 'p3c' },
-      { y: 245, id: 'p4f', parent: 'p3d', pruned: true },
+      { y: 245, id: 'p4f', parent: 'p3d' },
     ],
   ];
 
-  // Selected path (highlighted when t > 0.85): p1 → p2a → p3b → p4c
   const selectedPath = ['p1', 'p2a', 'p3b', 'p4c'];
-  const showSelected = t > 0.85;
 
   const nodeMap = {};
   tree.forEach((col, ci) => col.forEach(n => { nodeMap[n.id] = { ...n, x: phases[ci].x, phase: ci }; }));
+
+  // Reveal stage during phase A (also valid through B/tail since once revealed, stays).
+  const revealedPhase = phases.reduce((acc, p, i) => t > p.reveal ? i : acc, -1);
+  // Commit step: -1 before phase B starts, then 0..3 as commits land. Stays at 3 in tail.
+  let commitStep = -1;
+  for (let i = 0; i < commitTicks.length; i++) {
+    if (t >= commitTicks[i]) commitStep = i;
+  }
+
+  // Committed: prefix of selectedPath up to commitStep+1.
+  const committedSet = new Set(selectedPath.slice(0, commitStep + 1));
+
+  // Pruned: nodes whose parent is on the committed path but they are not, AND committed has reached at least their phase.
+  // Plus all descendants of pruned nodes.
+  const prunedSet = new Set();
+  for (let ci = 1; ci <= 3; ci++) {
+    for (const n of tree[ci]) {
+      // Already pruned by ancestor?
+      if (prunedSet.has(n.parent)) {
+        // Only mark pruned once parent's commit step has happened (so we don't pre-prune during phase A).
+        if (commitStep >= ci) prunedSet.add(n.id);
+        continue;
+      }
+      // Sibling of committed at this phase: prune at the moment its phase commits.
+      if (committedSet.has(n.parent) && !committedSet.has(n.id) && commitStep >= ci) {
+        prunedSet.add(n.id);
+      }
+    }
+  }
+
+  // Which committed node should pulse — the most-recently committed one.
+  const lastCommittedId = commitStep >= 0 ? selectedPath[commitStep] : null;
+
+  // Phase header annotation
+  const inPhaseA = t < 0.5;
 
   const phaseLabels = ['P1', 'P2', 'P3', 'P4'];
 
@@ -625,15 +645,15 @@ const StagedDev = () => {
         </g>
       ))}
 
-      {/* Edges — center to center so nothing looks gappy; the node fills sit on top */}
+      {/* Edges */}
       {tree.slice(1).map((col, ci) => col.map(n => {
         const p = nodeMap[n.parent];
         const c = nodeMap[n.id];
         const reveal = phases[ci + 1].reveal;
         const visible = t > reveal;
         if (!visible) return null;
-        const onPath = showSelected && selectedPath.includes(c.id) && selectedPath.includes(n.parent);
-        const pruned = n.pruned && t > reveal + 0.1;
+        const onPath = committedSet.has(c.id) && committedSet.has(n.parent);
+        const pruned = prunedSet.has(c.id);
         return (
           <line key={c.id}
             x1={p.x} y1={p.y}
@@ -651,8 +671,9 @@ const StagedDev = () => {
         const reveal = phases[ci].reveal;
         const visible = t > reveal;
         if (!visible) return null;
-        const onPath = showSelected && selectedPath.includes(n.id);
-        const pruned = n.pruned && t > reveal + 0.1;
+        const onPath = committedSet.has(n.id);
+        const pruned = prunedSet.has(n.id);
+        const isLastCommitted = n.id === lastCommittedId;
         return (
           <g key={n.id} transform={`translate(${phases[ci].x} ${n.y})`}
             style={{ animation: `stonePlace 0.4s ${ni*0.05}s both` }}>
@@ -662,7 +683,7 @@ const StagedDev = () => {
               strokeWidth={onPath ? 2 : 1}
               strokeDasharray={pruned ? '3 2' : '0'}
               opacity={pruned ? 0.5 : 1}/>
-            {onPath && (
+            {isLastCommitted && (
               <circle r="20" fill="none" stroke="#b8955a" strokeWidth="0.5" opacity="0.4">
                 <animate attributeName="r" from="14" to="22" dur="1.8s" repeatCount="indefinite"/>
                 <animate attributeName="opacity" from="0.6" to="0" dur="1.8s" repeatCount="indefinite"/>
@@ -678,15 +699,22 @@ const StagedDev = () => {
         );
       }))}
 
-      {/* Annotations — appear at specific moments */}
-      {t > 0.5 && (
+      {/* Annotations */}
+      {inPhaseA && revealedPhase >= 1 && (
         <g style={{ animation: 'fadeUp 0.5s both' }}>
-          <text x="200" y="48" fill="#c85a4a" fontSize="8" fontFamily="var(--mono)" textAnchor="middle" letterSpacing="0.1em">
-            DEFERRED &amp; PRUNED AS INFO ARRIVES
+          <text x="200" y="48" fill="#5a6872" fontSize="8" fontFamily="var(--mono)" textAnchor="middle" letterSpacing="0.1em">
+            ALL PATHWAYS OPEN
           </text>
         </g>
       )}
-      {showSelected && (
+      {!inPhaseA && commitStep >= 0 && (
+        <g style={{ animation: 'fadeUp 0.5s both' }} key={`hdr-${commitStep}`}>
+          <text x="200" y="48" fill="#c85a4a" fontSize="8" fontFamily="var(--mono)" textAnchor="middle" letterSpacing="0.1em">
+            COMMIT &amp; ABANDON AS INFO ARRIVES
+          </text>
+        </g>
+      )}
+      {commitStep >= 3 && (
         <g style={{ animation: 'fadeUp 0.5s both' }}>
           <text x="315" y="38" fill="#b8955a" fontSize="9" fontFamily="var(--mono)" textAnchor="middle" letterSpacing="0.1em">SELECTED PATH</text>
         </g>
@@ -815,15 +843,15 @@ const ContractualOptions = () => {
 
 const MECHANISMS = [
   { tag: 'SPATIAL RIGHTS', title: 'Control physical resources before they are needed.',
-    caption: 'Options on adjacent land, reserved expansion space within a facility, and rights-of-way secured for infrastructure that does not yet exist. The cheapest time to own the land is always before anyone else wants it.', Comp: SpatialRights },
+    caption: 'Options on adjacent land, reserved expansion space, and rights-of-way for infrastructure that does not yet exist. The cheapest time to own land is before anyone else wants it.', Comp: SpatialRights },
   { tag: 'MULTI-USE DESIGN', title: 'Engineer an asset to serve more than one future.',
-    caption: 'A data center whose power, cooling, and network topology can host AI training, AI inference, and general cloud workloads &mdash; for whichever hyperscaler wins the round. The shell stays fixed. The tenant and the workload can change.', Comp: MultiUse },
+    caption: 'A data center whose power, cooling, and network topology can host AI training, inference, or general cloud workloads — for whichever hyperscaler wins the round. The shell stays fixed; the tenant and the workload can change.', Comp: MultiUse },
   { tag: 'CAPACITY BUFFERS', title: 'Oversize quietly; densify cheaply.',
-    caption: 'Conduit, switchgear, HVAC, structural systems, fiber — rated today for loads the base case does not predict. When demand arrives, the marginal cost of meeting it has already been paid.', Comp: CapacityBuffers },
+    caption: 'Conduit, switchgear, HVAC, and fiber rated today for loads the base case does not predict. When demand arrives, the marginal cost of meeting it has already been paid.', Comp: CapacityBuffers },
   { tag: 'STAGED DEVELOPMENT', title: 'Build decision points into the plan.',
-    caption: 'Modular phases that can be added, modified, or deferred. Wind farms sited for full-field rollout. Solar-ready roofs. Grid connections pre-positioned for EV. Every phase boundary is an option to walk away.', Comp: StagedDev },
+    caption: 'Modular phases that can be added, modified, or deferred as information arrives. Every phase boundary is an option to commit, defer, or walk away.', Comp: StagedDev },
   { tag: 'CONTRACTUAL OPTIONS', title: 'Write optionality into the paperwork.',
-    caption: 'Volume options in offtake. Lease extension, renewal, and early-termination rights. Permits filed at greater capacity than currently required. Assignment clauses that let contracts pass cleanly to new owners.', Comp: ContractualOptions },
+    caption: 'Volume rights in offtake, extension and termination rights in leases, oversized permits, and clean assignment clauses. Optionality embedded at signature, exercisable later.', Comp: ContractualOptions },
 ];
 
 const FlexibilitySection = () => (
@@ -832,12 +860,7 @@ const FlexibilitySection = () => (
       <div className="section-head">
         <div className="num">02 / FIVE MECHANISMS</div>
         <div>
-          <div className="eyebrow" style={{ marginBottom: 20 }}><span>What Aji invests in</span></div>
-          <h2>Flexibility is built into assets, or it is impossible to bolt on.</h2>
-          <p className="dek">
-            Five mechanisms recur across every sector Aji covers &mdash; each a concrete,
-            underwritable way to preserve the right to adapt when the future diverges from the plan.
-          </p>
+          <h2>Five ways to build <em>aji</em> into real assets.</h2>
         </div>
       </div>
       {MECHANISMS.map((m, i) => (
@@ -850,297 +873,6 @@ const FlexibilitySection = () => (
 );
 
 Object.assign(window, { FlexibilitySection });
-
-
-// === optionvalue.jsx ===
-/* Option value diagrams: decision tree + lattice + optionality stacking */
-
-/* 1. DECISION TREE */
-const DecisionTree = () => {
-  const [active, setActive] = React.useState(0);
-  React.useEffect(() => {
-    const t = setInterval(() => setActive(p => (p + 1) % 4), 2000);
-    return () => clearInterval(t);
-  }, []);
-
-  /* simple binary tree, 3 levels; weight of lines changes based on active path */
-  const nodes = [
-    { id: 'r', x: 60, y: 200, label: 'TODAY' },
-    { id: 'u1', x: 180, y: 120, label: '+σ' },
-    { id: 'd1', x: 180, y: 280, label: '−σ' },
-    { id: 'uu', x: 300, y: 60, label: 'EXERCISE' },
-    { id: 'ud', x: 300, y: 180, label: 'HOLD' },
-    { id: 'du', x: 300, y: 220, label: 'HOLD' },
-    { id: 'dd', x: 300, y: 340, label: 'DEFER' },
-    { id: 'uuu', x: 440, y: 40, label: 'WIN++', terminal: true, val: '+4.2×' },
-    { id: 'uud', x: 440, y: 100, label: 'WIN+', terminal: true, val: '+1.1×' },
-    { id: 'udu', x: 440, y: 160, label: '•', terminal: true, val: '1.0×' },
-    { id: 'udd', x: 440, y: 220, label: '•', terminal: true, val: '0.8×' },
-    { id: 'dud', x: 440, y: 260, label: '•', terminal: true, val: '0.9×' },
-    { id: 'ddu', x: 440, y: 320, label: '-', terminal: true, val: '0.7×' },
-    { id: 'ddd', x: 440, y: 380, label: 'WALK', terminal: true, val: '-0.1×' },
-  ];
-
-  const paths = [
-    ['r','u1','uu','uuu'],
-    ['r','u1','ud','udu'],
-    ['r','d1','du','dud'],
-    ['r','d1','dd','ddd'],
-  ];
-  const activePath = paths[active];
-
-  const byId = Object.fromEntries(nodes.map(n => [n.id, n]));
-  const edges = [
-    ['r','u1'],['r','d1'],
-    ['u1','uu'],['u1','ud'],['d1','du'],['d1','dd'],
-    ['uu','uuu'],['uu','uud'],['ud','udu'],['ud','udd'],
-    ['du','dud'],['dd','ddu'],['dd','ddd'],
-  ];
-
-  return (
-    <svg viewBox="0 0 520 420" style={{ width: '100%', height: '100%' }}>
-      <rect width="520" height="420" fill="#0e1116"/>
-      {edges.map(([a,b], i) => {
-        const na = byId[a], nb = byId[b];
-        const on = activePath.includes(a) && activePath.includes(b);
-        return (
-          <line key={i} x1={na.x} y1={na.y} x2={nb.x} y2={nb.y}
-            stroke={on ? '#b8955a' : '#3d4a52'}
-            strokeWidth={on ? 1.4 : 0.8}
-            opacity={on ? 1 : 0.6}/>
-        );
-      })}
-      {nodes.map(n => {
-        const on = activePath.includes(n.id);
-        return (
-          <g key={n.id}>
-            <circle cx={n.x} cy={n.y} r={n.terminal ? 4 : 5}
-              fill={on ? '#b8955a' : '#1a1e24'}
-              stroke={on ? '#b8955a' : '#5a6872'} strokeWidth="1"/>
-            {!n.terminal && (
-              <text x={n.x} y={n.y - 12}
-                fill={on ? '#f5f1e8' : '#5a6872'}
-                fontSize="9" fontFamily="var(--mono)" textAnchor="middle" letterSpacing="0.08em">
-                {n.label}
-              </text>
-            )}
-            {n.terminal && (
-              <text x={n.x + 10} y={n.y + 3}
-                fill={on ? '#f5f1e8' : '#5a6872'}
-                fontSize="10" fontFamily="var(--mono)">
-                {n.val}
-              </text>
-            )}
-          </g>
-        );
-      })}
-      <text x="20" y="24" fill="#5a6872" fontSize="10" fontFamily="var(--mono)" letterSpacing="0.12em">
-        DECISION TREE · PAYOFF DISTRIBUTION
-      </text>
-    </svg>
-  );
-};
-
-/* 2. REAL OPTIONS LATTICE — binomial */
-const Lattice = () => {
-  const [t, setT] = React.useState(0);
-  React.useEffect(() => {
-    let raf; const loop = () => { setT(p => (p + 0.003) % 1); raf = requestAnimationFrame(loop); };
-    raf = requestAnimationFrame(loop); return () => cancelAnimationFrame(raf);
-  }, []);
-  const N = 5;
-  const nodes = [];
-  for (let i = 0; i <= N; i++) {
-    for (let j = 0; j <= i; j++) {
-      nodes.push({ i, j, x: 60 + i*80, y: 200 + (j - i/2) * 40 });
-    }
-  }
-  return (
-    <svg viewBox="0 0 520 420" style={{ width: '100%', height: '100%' }}>
-      <rect width="520" height="420" fill="#0e1116"/>
-      {/* edges */}
-      {nodes.filter(n => n.i < N).map(n => (
-        <React.Fragment key={`e-${n.i}-${n.j}`}>
-          <line x1={n.x} y1={n.y}
-            x2={60 + (n.i+1)*80} y2={200 + (n.j - (n.i+1)/2) * 40}
-            stroke="#3d4a52" strokeWidth="0.7"/>
-          <line x1={n.x} y1={n.y}
-            x2={60 + (n.i+1)*80} y2={200 + (n.j+1 - (n.i+1)/2) * 40}
-            stroke="#3d4a52" strokeWidth="0.7"/>
-        </React.Fragment>
-      ))}
-      {/* nodes */}
-      {nodes.map(n => {
-        const active = t * N >= n.i - 0.2 && t * N <= n.i + 0.3;
-        const val = Math.pow(1.15, n.j) * Math.pow(0.87, n.i - n.j);
-        const payoff = Math.max(0, val - 1);
-        return (
-          <g key={`n-${n.i}-${n.j}`}>
-            <circle cx={n.x} cy={n.y} r={3 + payoff*6}
-              fill={payoff > 0 ? '#b8955a' : '#1a1e24'}
-              stroke={active ? '#f5f1e8' : '#5a6872'}
-              strokeWidth={active ? 1.2 : 0.6}
-              opacity={payoff > 0 ? 0.2 + payoff*0.5 : 0.6}/>
-            {n.i === N && payoff > 0 && (
-              <text x={n.x + 12} y={n.y + 3}
-                fill="#b8955a" fontSize="9" fontFamily="var(--mono)">
-                +{(payoff * 100).toFixed(0)}
-              </text>
-            )}
-          </g>
-        );
-      })}
-      <text x="20" y="24" fill="#5a6872" fontSize="10" fontFamily="var(--mono)" letterSpacing="0.12em">
-        BINOMIAL LATTICE · ASYMMETRIC PAYOFF
-      </text>
-      <text x="20" y="400" fill="#5a6872" fontSize="9" fontFamily="var(--mono)" letterSpacing="0.1em">
-        t = 0 → T · nodes sized by intrinsic value
-      </text>
-    </svg>
-  );
-};
-
-/* 3. OPTIONALITY STACKING — stacked convex curves */
-const OptionStack = () => {
-  const [t, setT] = React.useState(0);
-  React.useEffect(() => {
-    let raf; const loop = () => { setT(p => (p + 0.004) % 1); raf = requestAnimationFrame(loop); };
-    raf = requestAnimationFrame(loop); return () => cancelAnimationFrame(raf);
-  }, []);
-  // four options, appearing sequentially
-  const opts = [
-    { strike: 0.35, color: '#6a8cb2', label: 'SPATIAL' },
-    { strike: 0.50, color: '#b8955a', label: 'MULTI-USE' },
-    { strike: 0.65, color: '#8a9d7f', label: 'BUFFERS' },
-    { strike: 0.78, color: '#c68659', label: 'STAGED' },
-  ];
-  const w = 520, h = 380;
-  const xScale = v => 40 + v * (w - 80);
-  const yScale = v => h - 40 - v * (h - 80);
-  const curve = (strike, activeness) => {
-    let d = `M ${xScale(0)} ${yScale(0)}`;
-    for (let v = 0; v <= 1; v += 0.01) {
-      const p = Math.max(0, v - strike) * 1.3 * activeness;
-      d += ` L ${xScale(v)} ${yScale(p)}`;
-    }
-    return d;
-  };
-  const sumCurve = () => {
-    let d = `M ${xScale(0)} ${yScale(0)}`;
-    for (let v = 0; v <= 1; v += 0.01) {
-      let sum = 0;
-      opts.forEach((o, i) => {
-        const active = Math.min(1, Math.max(0, (t * 4) - i));
-        sum += Math.max(0, v - o.strike) * 1.3 * active;
-      });
-      d += ` L ${xScale(v)} ${yScale(Math.min(0.95, sum))}`;
-    }
-    return d;
-  };
-  return (
-    <svg viewBox={`0 0 ${w} ${h}`} style={{ width: '100%', height: '100%' }}>
-      <rect width={w} height={h} fill="#0e1116"/>
-      {/* Axes */}
-      <line x1={xScale(0)} y1={yScale(0)} x2={xScale(1)} y2={yScale(0)} stroke="#3d4a52" strokeWidth="1"/>
-      <line x1={xScale(0)} y1={yScale(0)} x2={xScale(0)} y2={yScale(1)} stroke="#3d4a52" strokeWidth="1"/>
-      <text x={xScale(1)} y={yScale(0) + 22} fill="#5a6872" fontSize="9" fontFamily="var(--mono)" textAnchor="end" letterSpacing="0.1em">
-        UNCERTAINTY →
-      </text>
-      <text x={xScale(0) - 8} y={yScale(1) - 8} fill="#5a6872" fontSize="9" fontFamily="var(--mono)" letterSpacing="0.1em">
-        PAYOFF ↑
-      </text>
-      {/* Individual option curves */}
-      {opts.map((o, i) => {
-        const activeness = Math.min(1, Math.max(0, (t * 4) - i));
-        return (
-          <g key={i}>
-            <path d={curve(o.strike, activeness)}
-              fill="none" stroke={o.color} strokeWidth="1" opacity={0.5 * activeness}/>
-            {activeness > 0.1 && (
-              <g transform={`translate(${xScale(o.strike)} ${yScale(0) + 10})`}>
-                <line y1="-8" y2="0" stroke={o.color} strokeWidth="0.6"/>
-                <text fontSize="8" fill={o.color} fontFamily="var(--mono)" textAnchor="middle" y="14" letterSpacing="0.08em">
-                  {o.label}
-                </text>
-              </g>
-            )}
-          </g>
-        );
-      })}
-      {/* Sum curve — the portfolio */}
-      <path d={sumCurve()} fill="none" stroke="#f5f1e8" strokeWidth="1.6"/>
-      <text x={xScale(1) - 10} y={yScale(0.85)} fill="#f5f1e8" fontSize="10" fontFamily="var(--mono)" textAnchor="end" letterSpacing="0.12em">
-        STACKED PORTFOLIO
-      </text>
-      <text x="20" y="24" fill="#5a6872" fontSize="10" fontFamily="var(--mono)" letterSpacing="0.12em">
-        OPTIONALITY · STACKED CONVEXITY
-      </text>
-    </svg>
-  );
-};
-
-const OptionValueSection = () => {
-  const diagrams = [
-    { Comp: DecisionTree, label: 'Decision tree · Irreversibility priced',
-      title: 'Every project is a branching decision problem \u2014 and most branches are irreversible.',
-      body: 'Conventional DCF collapses the future into a single path. Aji prices each branch, and prices the fact that you cannot unbuild what you have already built. Downside is bounded by the cost of the option; upside compounds with uncertainty.' },
-    { Comp: OptionStack, label: 'Option stack · Compounding flexibility',
-      title: 'Stacked options are more than the sum of their parts.',
-      body: 'An owner with one real option has a hedge. An owner with five has compounding flexibility: the ability to weather conditions that would strand a less-optioned asset, and to exploit opportunities a less-optioned competitor cannot reach. Each mechanism is convex on its own; stacked together, they bend the payoff sharply upward as the world deviates from plan.' },
-  ];
-  return (
-    <section id="optionvalue" style={{ padding: '0 var(--gutter)' }}>
-      <div className="wrap-wide">
-        <div className="section-head">
-          <div className="num">03 / VALUATION</div>
-          <div>
-            <div className="eyebrow" style={{ marginBottom: 20 }}><span>Option value, made legible</span></div>
-            <h2>Where conventional models stop, ours begins.</h2>
-            <p className="dek">
-              Real-options valuation powered by reinforcement learning, built for the
-              complexity and irreversibility of real-asset decisions.
-            </p>
-          </div>
-        </div>
-        {diagrams.map((d, i) => (
-          <div key={i} style={{
-            borderTop: '1px solid var(--rule)',
-            padding: '56px 0',
-            display: 'grid',
-            gridTemplateColumns: i % 2 === 0 ? '1fr 1.2fr' : '1.2fr 1fr',
-            gap: 56, alignItems: 'center',
-          }} className="mechanism-row">
-            {i % 2 === 0 ? (
-              <>
-                <div>
-                  <div className="eyebrow" style={{ marginBottom: 16 }}><span>{`0${i+1} · ${d.label}`}</span></div>
-                  <h3 style={{ fontSize: 'clamp(26px, 2.4vw, 36px)', marginBottom: 16 }}>{d.title}</h3>
-                  <p style={{ color: 'var(--paper-soft)', maxWidth: '48ch', fontSize: 17, lineHeight: 1.6 }}>{d.body}</p>
-                </div>
-                <div style={{ aspectRatio: '4/3', background: 'var(--ink-soft)', border: '1px solid var(--rule)' }}>
-                  <d.Comp/>
-                </div>
-              </>
-            ) : (
-              <>
-                <div style={{ aspectRatio: '4/3', background: 'var(--ink-soft)', border: '1px solid var(--rule)' }}>
-                  <d.Comp/>
-                </div>
-                <div>
-                  <div className="eyebrow" style={{ marginBottom: 16 }}><span>{`0${i+1} · ${d.label}`}</span></div>
-                  <h3 style={{ fontSize: 'clamp(26px, 2.4vw, 36px)', marginBottom: 16 }}>{d.title}</h3>
-                  <p style={{ color: 'var(--paper-soft)', maxWidth: '48ch', fontSize: 17, lineHeight: 1.6 }}>{d.body}</p>
-                </div>
-              </>
-            )}
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-};
-
-Object.assign(window, { OptionValueSection });
 
 
 // === sections.jsx ===
@@ -1294,7 +1026,7 @@ const AssetClassesSection = () => (
   <section id="assets" style={{ padding: '0 var(--gutter)' }}>
     <div className="wrap-wide">
       <div className="section-head">
-        <div className="num">04 / COVERAGE</div>
+        <div className="num">03 / COVERAGE</div>
         <div>
           <div className="eyebrow" style={{ marginBottom: 20 }}><span>Where Aji looks</span></div>
           <h2>Aji&rsquo;s thesis applies wherever irreversible capital meets uncertainty.</h2>
@@ -1360,10 +1092,13 @@ const TeamSection = () => (
   <section id="team" style={{ padding: '0 var(--gutter)' }}>
     <div className="wrap-wide">
       <div className="section-head">
-        <div className="num">05 / TEAM</div>
+        <div className="num">04 / TEAM</div>
         <div>
           <div className="eyebrow" style={{ marginBottom: 20 }}><span>Who is behind this</span></div>
           <h2>Built by a practitioner, for practitioners.</h2>
+          <p className="dek" style={{ marginTop: 18 }}>
+            Aji is guided by a diverse board of advisors and supported by a network of subject-matter experts across engineering, finance, policy, and operations.
+          </p>
         </div>
       </div>
 
@@ -1414,12 +1149,28 @@ const InquirySection = () => {
   }, [formOpen]);
   const [form, setForm] = React.useState({ name: '', org: '', email: '', type: '', role: '', note: '' });
   const update = (k, v) => setForm(p => ({ ...p, [k]: v }));
-  const submit = (e) => { e.preventDefault(); setSent(true); };
+  const submit = (e) => {
+    e.preventDefault();
+    const subject = persona === 'investor'
+      ? `Aji Fund · LP inquiry — ${form.name || form.org || 'New inquiry'}`
+      : `Aji Fund · ${intent || 'inquiry'} — ${form.name || form.org || 'New message'}`;
+    const lines = [
+      `Name: ${form.name}`,
+      `Organization: ${form.org}`,
+      `Email: ${form.email}`,
+      persona === 'investor' ? `Investor type: ${form.type}` : `Role / capacity: ${form.role}`,
+      '',
+      'Message:',
+      form.note,
+    ];
+    window.location.href = `mailto:jleape@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`;
+    setSent(true);
+  };
   return (
     <section id="contact" style={{ padding: '0 var(--gutter)' }}>
       <div className="wrap-wide">
         <div className="section-head">
-          <div className="num">06 / INVEST</div>
+          <div className="num">05 / INVEST</div>
           <div>
             <div className="eyebrow" style={{ marginBottom: 20 }}><span>Ways in</span></div>
             <h2>Invest with Aji. Or build with Aji.</h2>
@@ -1693,7 +1444,7 @@ const InquirySection = () => {
             <p style={{ color: 'var(--paper-soft)', fontSize: 14, lineHeight: 1.55, margin: '-8px 0 8px', maxWidth: '42ch' }}>
               {persona === 'investor'
                 ? 'Aji is a Reg D limited partnership. Institutions, family offices, and accredited investors only. We respond personally to every message.'
-                : 'Academics, developers, government officials, advisors. Tell us what you\u2019re working on and we\u2019ll find time to talk.'}
+                : 'Academics, developers, government officials, advisors. Tell us what you’re working on and we’ll find time to talk.'}
             </p>
 
             {sent ? (
@@ -1796,9 +1547,8 @@ const Nav = ({ mode }) => {
         <span>Aji</span>
       </a>
       <div className="nav-links">
-        <a href="#philosophy">Thesis</a>
+        <a href="#philosophy">Process</a>
         <a href="#flexibility">Mechanisms</a>
-        <a href="#optionvalue">Valuation</a>
         <a href="#assets">Coverage</a>
         <a href="#team">Team</a>
         <a href="#contact">Contact</a>
@@ -1822,24 +1572,7 @@ const Hero = () => (
         across many.
       </h1>
       <div style={{ marginTop: 32, display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-        <a href="#philosophy" className="link-ghost">Read the thesis <span className="arrow">→</span></a>
-        <a href="#contact" className="link-ghost" style={{ color: 'var(--paper)', borderBottomColor: 'rgba(245,241,232,0.4)' }}>
-          Download PDF <span className="arrow">↓</span>
-        </a>
-      </div>
-      <div className="hero-meta">
-        <div>
-          <span>Stage</span>
-          Seed allocation
-        </div>
-        <div>
-          <span>Strategy</span>
-          Real-asset optionality
-        </div>
-        <div>
-          <span>Structure</span>
-          Limited partnership
-        </div>
+        <a href={thesisPdf} download="aji_fund_thesis_v34.pdf" className="link-ghost">Download the thesis <span className="arrow">→</span></a>
       </div>
     </div>
     <div>
@@ -1857,9 +1590,7 @@ const Hero = () => (
         }}>
           <em>Aji</em> is the Japanese Go term for a move whose value compounds
           quietly &mdash; a position that looks unremarkable now but reshapes the
-          board later. AlphaGo&rsquo;s Move 37 against Lee Sedol is the canonical
-          example. Real assets are full of aji that nobody pays for, and nobody
-          builds in.
+          board later.
         </p>
       </div>
     </div>
@@ -1870,67 +1601,37 @@ const Philosophy = () => (
   <section id="philosophy" style={{ padding: '0 var(--gutter)' }}>
     <div className="wrap-wide">
       <div className="section-head">
-        <div className="num">01 / THESIS</div>
+        <div className="num">01 / PROCESS</div>
         <div>
-          <div className="eyebrow" style={{ marginBottom: 20 }}><span>A lesson not learned</span></div>
-          <h2>Real assets are overfit to a single scenario. When the future unfolds differently, their owners suffer.</h2>
+          <h2>The Aji Process</h2>
         </div>
       </div>
-      <div style={{
-        display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80,
-        padding: '40px 0 80px',
-      }} className="philo-grid">
-        <div className="prose">
-          <p>
-            After the Civil War, developers raced to lay railroad track across the country.
-            Many chose narrow gauge &mdash; a third to half cheaper to build, easier through
-            hard terrain &mdash; and incompatible with the standard-gauge network that emerged.
-            All but 46 miles of the nearly 12,000 built were eventually abandoned or converted
-            at great expense.
-          </p>
-          <p>
-            A century later, Manhattan office owners faced the same mistake in a different costume.
-            Investments in strategic HVAC sizing, fungible floor plans, and flexible permits
-            <em> would have preserved the option to convert </em>
-            &mdash; but the option wasn&rsquo;t priced, so it wasn&rsquo;t built.
-          </p>
-          <p>
-            Today, hyperscalers are racing to build AI data centers on a scale that dwarfs
-            every prior buildout &mdash; power density, cooling architecture, and network topology
-            co-optimized for one tenant&rsquo;s specifications. If demand shifts or lease terms expire,
-            these bespoke facilities face the same fate as narrow-gauge track.
-          </p>
-        </div>
-        <div className="prose">
-          <p>
-            Aji addresses this directly, in three steps:
-          </p>
-          <ol style={{ fontFamily: 'var(--serif)', fontSize: 19, lineHeight: 1.5, color: 'var(--paper)', paddingLeft: 0, listStyle: 'none', counterReset: 'step' }}>
-            {[
-              ['Audit', 'Identify specific options to create using tools like Design Structure Matrices.'],
-              ['Value', "Select and size options with Aji's proprietary real-options valuation model, powered by deep reinforcement learning."],
-              ['Fund', 'Invest in those options directly.'],
-            ].map(([k, v], i) => (
-              <li key={i} style={{
-                counterIncrement: 'step', paddingLeft: 60, position: 'relative',
-                paddingBottom: 20, marginBottom: 20, borderBottom: '1px solid var(--rule)',
-              }}>
-                <span style={{
-                  position: 'absolute', left: 0, top: 2,
-                  fontFamily: 'var(--mono)', fontSize: 11,
-                  letterSpacing: '0.14em', color: 'var(--gold)',
-                  textTransform: 'uppercase',
-                }}>0{i+1}</span>
-                <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 6 }}>{k}</div>
-                <div>{v}</div>
-              </li>
-            ))}
-          </ol>
-          <p style={{ marginTop: 24 }}>
-            Because Aji provides the capital, there is no need to convince developers to think
-            long-term or investors to modify their valuation models.
-          </p>
-        </div>
+      <div style={{ padding: '40px 0 80px' }}>
+        <ol style={{
+          fontFamily: 'var(--serif)', fontSize: 22, lineHeight: 1.5, color: 'var(--paper)',
+          paddingLeft: 0, listStyle: 'none', counterReset: 'step',
+          maxWidth: 880, margin: 0,
+        }}>
+          {[
+            ['Discover', 'Identify opportunities to create options.'],
+            ['Value', "Select and size options with Aji's proprietary real-options valuation tool."],
+            ['Fund', 'Invest in those options directly.'],
+          ].map(([k, v], i) => (
+            <li key={i} style={{
+              counterIncrement: 'step', paddingLeft: 80, position: 'relative',
+              paddingBottom: 28, marginBottom: 28, borderBottom: '1px solid var(--rule)',
+            }}>
+              <span style={{
+                position: 'absolute', left: 0, top: 6,
+                fontFamily: 'var(--mono)', fontSize: 12,
+                letterSpacing: '0.14em', color: 'var(--gold)',
+                textTransform: 'uppercase',
+              }}>0{i+1}</span>
+              <div style={{ fontFamily: 'var(--mono)', fontSize: 12, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 10 }}>{k}</div>
+              <div>{v}</div>
+            </li>
+          ))}
+        </ol>
       </div>
     </div>
   </section>
@@ -1948,23 +1649,20 @@ const Footer = () => (
       </div>
       <div>
         <h4>The Fund</h4>
-        <a href="#philosophy">Origin &amp; thesis</a>
+        <a href="#philosophy">The Aji Process</a>
         <a href="#flexibility">Five mechanisms</a>
-        <a href="#optionvalue">Valuation</a>
         <a href="#assets">Coverage</a>
         <a href="#team">Team</a>
       </div>
       <div>
         <h4>Resources</h4>
-        <a href="#">Investment thesis (PDF)</a>
-        <a href="#">Market opportunity</a>
-        <a href="#">Structure &amp; terms</a>
-        <a href="#">Aji Exchange ↗</a>
+        <a href={thesisPdf} download="aji_fund_thesis_v34.pdf">Investment thesis (PDF)</a>
+        <a href="https://jleape.github.io/apps/aji/marketplace.html" target="_blank" rel="noopener">Aji Exchange →</a>
       </div>
       <div>
         <h4>Contact</h4>
         <a href="#contact">LP inquiry</a>
-        <a href="mailto:lp@aji.fund">lp@aji.fund</a>
+        <a href="mailto:jleape@gmail.com">jleape@gmail.com</a>
         <div style={{ marginTop: 24, fontSize: 10, opacity: 0.6, lineHeight: 1.6 }}>
           No part of this site constitutes an offer to sell or a solicitation to buy securities.
           Any offering made only by PPM to qualified investors.
@@ -1985,14 +1683,12 @@ const Footer = () => (
   </footer>
 );
 
-
 const App = () => (
   <>
     <Nav/>
     <Hero/>
     <Philosophy/>
     <FlexibilitySection/>
-    <OptionValueSection/>
     <AssetClassesSection/>
     <TeamSection/>
     <InquirySection/>
@@ -2001,5 +1697,3 @@ const App = () => (
 );
 
 export default App;
-
-

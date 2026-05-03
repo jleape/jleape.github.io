@@ -10,7 +10,7 @@
     "publish:gambiarra": "npm run install:gambiarra && npm run build:gambiarra && npm run encrypt:gambiarra",
     "install:aji": "npm install --prefix private/_src/apps/aji && npm install --prefix private/_src/apps/aji-marketplace",
     "extract:aji": "python3 private/_src/apps/aji/scripts/extract.py /tmp/aji-claude-design/aji-website/project/index.html private/_src/apps/aji && python3 private/_src/apps/aji-marketplace/scripts/extract.py /tmp/aji-claude-design/aji-website/project/marketplace.html /tmp/aji-claude-design/aji-website/project/marketplace-app.jsx private/_src/apps/aji-marketplace",
-    "build:aji": "npm run build --prefix private/_src/apps/aji && npm run build --prefix private/_src/apps/aji-marketplace",
+    "build:aji": "cp /Users/jleape/workspace/claude_apps/aji/prototype/aji_fund_thesis_v34.pdf private/_src/apps/aji/src/aji_fund_thesis_v34.pdf && npm run build --prefix private/_src/apps/aji && npm run build --prefix private/_src/apps/aji-marketplace",
     "encrypt:aji": "staticrypt private/_src/apps/aji/dist/index.html -p \"$STATICRYPT_PW_AJI\" --short --remember 30 -d apps/aji --template-title Stealth --template-instructions \"Enter password to continue.\" --template-button Unlock && cp private/_src/apps/aji-marketplace/dist/index.html private/_src/apps/aji-marketplace/dist/marketplace.html && staticrypt private/_src/apps/aji-marketplace/dist/marketplace.html -p \"$STATICRYPT_PW_AJI\" --short --remember 30 -d apps/aji --template-title Stealth --template-instructions \"Enter password to continue.\" --template-button Unlock",
     "publish:aji": "npm run install:aji && npm run build:aji && npm run encrypt:aji",
     "install:rally": "npm install --prefix private/_src/apps/rally",

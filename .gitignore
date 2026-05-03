@@ -10,3 +10,4 @@ node_modules
 .env
 private/_src/**/dist/
 private/_src/**/node_modules/
+private/_src/apps/aji/src/aji_fund_thesis_v34.pdf
