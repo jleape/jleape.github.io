@@ -224,7 +224,7 @@ const GoBoard = ({ showOverlay = true }) => {
           fontStyle: 'italic',
           maxWidth: '62ch',
         }}>
-          Move 37 seemed like a mistake, until it led to AlphaGo's milestone victory.
+          Move 37 seemed like a mistake, until it led to AlphaGo's milestone victory. Move 37 had "aji", a Japanese term used for moves that quietly create future opportunities, just like Aji Fund's investments.
         </div>
       </div>
     </div>
@@ -842,13 +842,13 @@ const ContractualOptions = () => {
 };
 
 const MECHANISMS = [
-  { tag: 'SPATIAL RIGHTS', title: 'Control physical resources before they are needed.',
+  { tag: 'SPATIAL RIGHTS', title: 'Secure physical resources before they are needed.',
     caption: 'Options on adjacent land, reserved expansion space, and rights-of-way for infrastructure that does not yet exist. The cheapest time to own land is before anyone else wants it.', Comp: SpatialRights },
-  { tag: 'MULTI-USE DESIGN', title: 'Engineer an asset to serve more than one future.',
+  { tag: 'MULTI-USE DESIGN', title: 'Engineer multi-purpose assets.',
     caption: 'A data center whose power, cooling, and network topology can host AI training, inference, or general cloud workloads — for whichever hyperscaler wins the round. The shell stays fixed; the tenant and the workload can change.', Comp: MultiUse },
   { tag: 'CAPACITY BUFFERS', title: 'Oversize quietly; densify cheaply.',
     caption: 'Conduit, switchgear, HVAC, and fiber rated today for loads the base case does not predict. When demand arrives, the marginal cost of meeting it has already been paid.', Comp: CapacityBuffers },
-  { tag: 'STAGED DEVELOPMENT', title: 'Build decision points into the plan.',
+  { tag: 'STAGED DEVELOPMENT', title: 'Build decision gates into the plan.',
     caption: 'Modular phases that can be added, modified, or deferred as information arrives. Every phase boundary is an option to commit, defer, or walk away.', Comp: StagedDev },
   { tag: 'CONTRACTUAL OPTIONS', title: 'Write optionality into the paperwork.',
     caption: 'Volume rights in offtake, extension and termination rights in leases, oversized permits, and clean assignment clauses. Optionality embedded at signature, exercisable later.', Comp: ContractualOptions },
@@ -1028,7 +1028,6 @@ const AssetClassesSection = () => (
       <div className="section-head">
         <div className="num">03 / COVERAGE</div>
         <div>
-          <div className="eyebrow" style={{ marginBottom: 20 }}><span>Where Aji looks</span></div>
           <h2>Aji&rsquo;s thesis applies wherever irreversible capital meets uncertainty.</h2>
         </div>
       </div>
@@ -1094,7 +1093,6 @@ const TeamSection = () => (
       <div className="section-head">
         <div className="num">04 / TEAM</div>
         <div>
-          <div className="eyebrow" style={{ marginBottom: 20 }}><span>Who is behind this</span></div>
           <h2>Built by a practitioner, for practitioners.</h2>
           <p className="dek" style={{ marginTop: 18 }}>
             Aji is guided by a diverse board of advisors and supported by a network of subject-matter experts across engineering, finance, policy, and operations.
@@ -1172,8 +1170,7 @@ const InquirySection = () => {
         <div className="section-head">
           <div className="num">05 / INVEST</div>
           <div>
-            <div className="eyebrow" style={{ marginBottom: 20 }}><span>Ways in</span></div>
-            <h2>Invest with Aji. Or build with Aji.</h2>
+            <h2>Get in on Aji.</h2>
           </div>
         </div>
 
@@ -1577,22 +1574,6 @@ const Hero = () => (
     </div>
     <div>
       <GoBoard/>
-      <div className="hero-aji" style={{
-        marginTop: 28,
-        paddingTop: 20,
-        borderTop: '1px solid var(--rule)',
-      }}>
-        <div className="eyebrow" style={{ marginBottom: 14 }}><span>Why &ldquo;Aji&rdquo;</span></div>
-        <p style={{
-          fontFamily: 'var(--serif)', fontSize: 18, lineHeight: 1.5,
-          color: 'var(--paper)', margin: 0, maxWidth: '60ch',
-          letterSpacing: '-0.005em',
-        }}>
-          <em>Aji</em> is the Japanese Go term for a move whose value compounds
-          quietly &mdash; a position that looks unremarkable now but reshapes the
-          board later.
-        </p>
-      </div>
     </div>
   </section>
 );
