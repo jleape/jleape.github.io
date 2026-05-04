@@ -21,5 +21,5 @@
     <circle cx="0" cy="10" r="9" fill="none" stroke="#b8955a" stroke-width="0.6" opacity="0.5"/>
     <circle cx="0" cy="10" r="13" fill="none" stroke="#b8955a" stroke-width="0.4" opacity="0.25"/>
   </g>
-  <text x="50" y="80" font-family="Fraunces, Georgia, 'Times New Roman', serif" font-size="22" font-style="italic" font-weight="500" fill="#f5f1e8" text-anchor="middle" letter-spacing="-0.5">Aji</text>
+  <text x="50" y="80" font-family="Fraunces, Georgia, 'Times New Roman', serif" font-size="14" font-style="italic" font-weight="500" fill="#f5f1e8" text-anchor="middle" letter-spacing="-0.3">Aji | Fund</text>
 </svg>
