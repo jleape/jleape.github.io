@@ -1,15 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
   <rect width="100" height="100" fill="#262625"/>
-  <g transform="translate(50 40)">
-    <g stroke="#4a4a48" stroke-width="0.5" stroke-linecap="square">
-      <line x1="-26" y1="16" x2="26" y2="16"/>
-      <line x1="-26" y1="-20" x2="-26" y2="16"/>
+  <g transform="translate(50 38)">
+    <!-- Long call: top-left -->
+    <g transform="translate(-14 -12)">
+      <rect x="-11" y="-9" width="22" height="18" fill="none" stroke="#3a3a38" stroke-width="0.4"/>
+      <line x1="-11" y1="3" x2="11" y2="3" stroke="#4a4a48" stroke-width="0.3"/>
+      <path d="M -10 3 L 0 3 L 10 -7" fill="none" stroke="#8B1E2D" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
-    <path d="M -26 8 L -16 4 L -8 -2 L 0 -6 L 8 -10 L 16 -4 L 26 -14 L 26 16 L -26 16 Z"
-          fill="#8B1E2D" opacity="0.28"/>
-    <path d="M -26 8 L -16 4 L -8 -2 L 0 -6 L 8 -10 L 16 -4 L 26 -14"
-          fill="none" stroke="#8B1E2D" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-    <circle cx="26" cy="-14" r="2.4" fill="#f5f1e8"/>
+    <!-- Long put: top-right -->
+    <g transform="translate(14 -12)">
+      <rect x="-11" y="-9" width="22" height="18" fill="none" stroke="#3a3a38" stroke-width="0.4"/>
+      <line x1="-11" y1="3" x2="11" y2="3" stroke="#4a4a48" stroke-width="0.3"/>
+      <path d="M -10 -7 L 0 3 L 10 3" fill="none" stroke="#8B1E2D" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <!-- Long straddle: bottom-left -->
+    <g transform="translate(-14 12)">
+      <rect x="-11" y="-9" width="22" height="18" fill="none" stroke="#3a3a38" stroke-width="0.4"/>
+      <line x1="-11" y1="3" x2="11" y2="3" stroke="#4a4a48" stroke-width="0.3"/>
+      <path d="M -10 -6 L 0 3 L 10 -6" fill="none" stroke="#8B1E2D" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <!-- Long butterfly: bottom-right -->
+    <g transform="translate(14 12)">
+      <rect x="-11" y="-9" width="22" height="18" fill="none" stroke="#3a3a38" stroke-width="0.4"/>
+      <line x1="-11" y1="3" x2="11" y2="3" stroke="#4a4a48" stroke-width="0.3"/>
+      <path d="M -10 3 L -4 3 L 0 -6 L 4 3 L 10 3" fill="none" stroke="#8B1E2D" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
   </g>
   <text x="50" y="80" font-family="Fraunces, Georgia, 'Times New Roman', serif" font-size="14" font-style="italic" font-weight="500" fill="#f5f1e8" text-anchor="middle" letter-spacing="-0.3">Aji | X</text>
 </svg>
