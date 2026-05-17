@@ -25,7 +25,11 @@
     "publish:dsm": "npm run install:dsm && npm run build:dsm && npm run encrypt:dsm",
     "build:supply": "mkdir -p private/_src/apps/supply/dist && cp /Users/jleape/workspace/claude_apps/supply/supply.html private/_src/apps/supply/dist/index.html",
     "encrypt:supply": "staticrypt private/_src/apps/supply/dist/index.html -p \"$STATICRYPT_PW_SUPPLY\" --short --remember 30 -d apps/supply --template-title Stealth --template-instructions \"Enter password to continue.\" --template-button Unlock",
-    "publish:supply": "npm run build:supply && npm run encrypt:supply"
+    "publish:supply": "npm run build:supply && npm run encrypt:supply",
+    "install:rowboat": "npm install --prefix private/_src/apps/rowboat/frontend",
+    "build:rowboat": "npm run build --prefix private/_src/apps/rowboat/frontend",
+    "bundle:rowboat": "mkdir -p apps/rowboat && rm -rf apps/rowboat/assets && cp private/_src/apps/rowboat/frontend/dist/index.html apps/rowboat/index.html && cp -R private/_src/apps/rowboat/frontend/dist/assets apps/rowboat/assets",
+    "publish:rowboat": "npm run install:rowboat && npm run build:rowboat && npm run bundle:rowboat"
   },
   "devDependencies": {
     "staticrypt": "^3.5.0"
