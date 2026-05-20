@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+  <rect width="100" height="100" fill="#262625"/>
+  <g fill="none" stroke="#6ea8ff" stroke-width="1.6" stroke-linecap="round">
+    <path d="M47 36 Q35 29 25 18"/>
+    <path d="M50 35 L50 15"/>
+    <path d="M53 36 Q65 29 75 18"/>
+  </g>
+  <g fill="#6ea8ff">
+    <circle cx="25" cy="18" r="2.2"/>
+    <circle cx="50" cy="15" r="2.2"/>
+    <circle cx="75" cy="18" r="2.2"/>
+  </g>
+  <text x="50" y="61" font-size="32" text-anchor="middle">🏠</text>
+  <text x="50" y="81" font-family="'Inter', system-ui, -apple-system, sans-serif" font-size="9" font-weight="600" fill="#f5f1e8" text-anchor="middle" letter-spacing="-0.2">Whereabouts?</text>
+</svg>

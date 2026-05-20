@@ -29,7 +29,11 @@
     "install:rowboat": "npm install --prefix private/_src/apps/rowboat/frontend",
     "build:rowboat": "npm run build --prefix private/_src/apps/rowboat/frontend",
     "bundle:rowboat": "mkdir -p apps/rowboat && rm -rf apps/rowboat/assets && cp private/_src/apps/rowboat/frontend/dist/index.html apps/rowboat/index.html && cp -R private/_src/apps/rowboat/frontend/dist/assets apps/rowboat/assets",
-    "publish:rowboat": "npm run install:rowboat && npm run build:rowboat && npm run bundle:rowboat"
+    "publish:rowboat": "npm run install:rowboat && npm run build:rowboat && npm run bundle:rowboat",
+    "install:whereabouts": "npm install --prefix /Users/jleape/workspace/whereabouts",
+    "build:whereabouts": "npm run build --prefix /Users/jleape/workspace/whereabouts",
+    "bundle:whereabouts": "rm -rf apps/whereabouts && mkdir -p apps/whereabouts && cp -R /Users/jleape/workspace/whereabouts/dist/. apps/whereabouts/",
+    "publish:whereabouts": "npm run install:whereabouts && npm run build:whereabouts && npm run bundle:whereabouts"
   },
   "devDependencies": {
     "staticrypt": "^3.5.0"

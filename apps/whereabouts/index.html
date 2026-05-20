@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/apps/whereabouts/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Whereabouts? — find your neighborhood</title>
+    <script type="module" crossorigin src="/apps/whereabouts/assets/index-WoELga_K.js"></script>
+    <link rel="stylesheet" crossorigin href="/apps/whereabouts/assets/index-uJ00fzCK.css">
+  </head>
+  <body>
+    <div id="map"></div>
+    <aside id="panel">
+      <header>
+        <h1>Whereabouts? · San Francisco</h1>
+        <p class="tagline">Because 10,000 steps is overrated.</p>
+        <div id="matrix-status" class="status"></div>
+      </header>
+      <section id="destinations-section">
+        <div class="row between">
+          <h2>Whereabouts do you go?</h2>
+          <button id="add-dest-btn" type="button" class="toggle">+ Add</button>
+        </div>
+        <div id="preset-groups" class="preset-groups">
+          <select id="preset-select"></select>
+        </div>
+        <div id="destinations-list"></div>
+        <button id="done-btn" type="button" class="primary" disabled>Do the sums</button>
+        <div class="io-row">
+          <button id="save-btn" type="button" class="secondary">💾 Save to file</button>
+          <button id="load-btn" type="button" class="secondary">⬆️ Load from file</button>
+        </div>
+      </section>
+      <section id="results-section" hidden>
+        <h2>Weekly time wasted</h2>
+        <div id="legend"></div>
+        <div id="cap-control">
+          <label for="cap-slider">Can't be bothered point: <span id="cap-value">—</span></label>
+          <input id="cap-slider" type="range" step="1" />
+        </div>
+        <button id="abode-btn" type="button" class="toggle">Whereabouts will you live?</button>
+        <div id="apartment-links" hidden>
+          <label>Hunt for an apartment near your spot</label>
+          <div class="apt-links"></div>
+        </div>
+        <button id="reset-btn" type="button" class="secondary">Clear the decks</button>
+      </section>
+    </aside>
+    <div id="popup-root"></div>
+  </body>
+</html>
